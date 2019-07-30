@@ -7,8 +7,9 @@ node {
     }
 
     stage('Build') {
-
-          build_dir = getdir(tag)
+          def io_op = load "jenkinslib/io_operations.groovy"
+          def current_dir = pwd()
+          def build_dir = io_op.getdir(tag, current_dir)
           println build_dir
           def lsla = script sh: "ls -la", returnStdout: true
           println lsla
@@ -17,33 +18,5 @@ node {
             println build_output
           }
     }
-
-    def listdirs(dir) {
-        def currentDir = new File(dir)
-        def dirs = []
-        currentDir.eachFile FileType.DIRECTORIES, {
-            dirs << it.name
-        }
-        return dirs
-    }
-
-  
-    def getdir(tag){
-        dirs = listdirs("../")  
-        double_tag = tag.tokenize("-")[0] + "-" + tag.tokenize("-")[1]
-        single_tag = tag.tokenize("-")[0]
-        if (double_tag in dirs) {
-            println "Got double"
-            return double_tag
-        }
-        else if(single_tag in dirs) {
-            println "Got single"
-            return single_tag
-        }
-        else {
-            return null
-        }
-    }
-
 
 }

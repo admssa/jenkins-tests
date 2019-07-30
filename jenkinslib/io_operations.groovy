@@ -13,8 +13,8 @@ def listdirs(dir) {
 }
 
 @NonCPS
-def getdir(tag){
-    dirs = listdirs("../")
+def getdir(tag, dir){
+    dirs = listdirs(".")
     def tag_in_dirs = false    
     double_tag = tag.tokenize("-")[0] + "-" + tag.tokenize("-")[1]
     single_tag = tag.tokenize("-")[0]
