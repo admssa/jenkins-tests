@@ -4,7 +4,7 @@ node {
     def tag = env.TAG_NAME
     def tag_date = env.TAG_DATE
     def io_op = load "jenkinslib/io_operations.groovy"
-    def build_dir = io_op.getdit(tag)
+    def build_dir = io_op.getdir(tag)
 
     stage('Git checkout current tag'){
         checkout scm
