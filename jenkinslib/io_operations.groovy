@@ -2,7 +2,6 @@
 
 import groovy.io.*
 
-@NonCPS
 def listdirs(dir) {
     def currentDir = new File(dir)
     def dirs = []
@@ -12,9 +11,8 @@ def listdirs(dir) {
     return dirs
 }
 
-@NonCPS
 def getdir(tag, dir){
-    dirs = listdirs(".")
+    dirs = listdirs(dir)
     def tag_in_dirs = false    
     double_tag = tag.tokenize("-")[0] + "-" + tag.tokenize("-")[1]
     single_tag = tag.tokenize("-")[0]
