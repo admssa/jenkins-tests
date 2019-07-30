@@ -3,13 +3,13 @@
 import groovy.io.*
 
 def listdirs(dir) {
-	dlist = []
-	new File(dir).eachDir {dlist << it.name }
-	dlist.sort()
-
-    return dlist.flatten()
+    def currentDir = new File('.')
+    def dirs = []
+    currentDir.eachFile FileType.DIRECTORIES, {
+        dirs << it.name
+    }
+    return dirs
 }
-
 def getdir(tag){
     dirs = listdirs(".")
     def tag_in_dirs = false    
