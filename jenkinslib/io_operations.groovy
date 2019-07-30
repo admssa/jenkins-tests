@@ -11,14 +11,16 @@ def listdirs(dir) {
     return dirs
 }
 def getdir(tag){
-    dirs = listdirs("../")
+    dirs = listdirs(".")
     def tag_in_dirs = false    
-    doble_tag = tag.tokenize("-")[0] + "-" + tag.tokenize("-")[1]
+    double_tag = tag.tokenize("-")[0] + "-" + tag.tokenize("-")[1]
     single_tag = tag.tokenize("-")[0]
     if (doble_tag in dirs) {
+        println "Got double"
         return doble_tag
     }
     else if(single_tag in dirs) {
+        println "Got single"
         return single_tag
     }
     else {
