@@ -17,7 +17,7 @@ def getdir(tag){
     single_tag = tag.tokenize("-")[0]
     if (doble_tag in dirs) {
         println "Got double"
-        return doble_tag
+        return double_tag
     }
     else if(single_tag in dirs) {
         println "Got single"
