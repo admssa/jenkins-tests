@@ -6,10 +6,10 @@ node {
     }
 
     stage('Build') {
-             steps {
+
                 echo 'Building only'
                 def build = sh script: "cd tag0 && docker build -t ${tag}", returnStdout: true
                 echo build
-        }
+
     }
 }
