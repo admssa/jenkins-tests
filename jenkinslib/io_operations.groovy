@@ -2,6 +2,7 @@
 
 import groovy.io.*
 
+@NonCPS
 def listdirs(dir) {
     def currentDir = new File(dir)
     def dirs = []

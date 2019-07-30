@@ -9,7 +9,7 @@ node {
           def io_op = load "jenkinslib/io_operations.groovy"
           def current_dir = pwd()
           def build_dir = io_op.getdir(tag, current_dir)
-          println "POINT"
+          println current_dir
           println build_dir
         
           if (build_dir) {
