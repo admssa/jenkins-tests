@@ -2,6 +2,7 @@
 
 import groovy.io.*
 
+@NonCPS
 def listdirs(dir) {
     def currentDir = new File('.')
     def dirs = []
@@ -10,6 +11,8 @@ def listdirs(dir) {
     }
     return dirs
 }
+
+@NonCPS
 def getdir(tag){
     dirs = listdirs(".")
     def tag_in_dirs = false    
