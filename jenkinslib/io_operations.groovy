@@ -25,3 +25,5 @@ def getdir(tag){
         return null
     }
 }
+
+return this
