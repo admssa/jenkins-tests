@@ -1,9 +1,5 @@
 #!groovy
 
-def bd = "null" 
-if (bd) {
-    println "string"
-}
-else{
-    println "null"
-}
+def lib =  load("jenkinslib/io_operations.groovy")
+
+ result = lib.getdir("tag0-test-8.6-1")

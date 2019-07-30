@@ -4,7 +4,7 @@ import groovy.io.*
 
 @NonCPS
 def listdirs(dir) {
-    def currentDir = new File('.')
+    def currentDir = new File(dir)
     def dirs = []
     currentDir.eachFile FileType.DIRECTORIES, {
         dirs << it.name
@@ -14,7 +14,7 @@ def listdirs(dir) {
 
 @NonCPS
 def getdir(tag){
-    dirs = listdirs(".")
+    dirs = listdirs("../")
     def tag_in_dirs = false    
     double_tag = tag.tokenize("-")[0] + "-" + tag.tokenize("-")[1]
     single_tag = tag.tokenize("-")[0]
