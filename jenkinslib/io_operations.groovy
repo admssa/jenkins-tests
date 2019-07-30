@@ -25,3 +25,7 @@ def getdir(tag){
         return null
     }
 }
+
+tag = "tag0-test-8.2-1"
+def dir = getdir(tag)
+println dir
