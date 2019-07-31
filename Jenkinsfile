@@ -14,7 +14,7 @@ node {
     stage('Build') {
           println build_dir
           if (build_dir != null) {
-            def img = docker.build("${docker_repo}:${tag}", "-f Dockerfile ./${build_dir}")  
+            def img = docker.build("${docker_repo}:${tag}", "-f ./${build_dir}/Dockerfile ./${build_dir}")  
             ehco img            
           }
         }
