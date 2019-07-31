@@ -8,12 +8,13 @@ node {
     def docker_repo = "admssa/diag"
     def io_op = load "jenkinslib/io_operations.groovy"
     def build_dir = io_op.getdir(tag, pwd())
+    def img = null
 
- docker.withRegistry('https://registry.hub.docker.com', 'admssa_dockerhub') {
+ docker.withRegistry('', 'admssa_dockerhub') {
     stage('Build & push') {
           println build_dir
           if (build_dir != null) {
-            def img = docker.build("${docker_repo}:${tag}", "-f ./${build_dir}/Dockerfile ./${build_dir}")  
+            img = docker.build("${docker_repo}:${tag}", "-f ./${build_dir}/Dockerfile ./${build_dir}")  
             img.push()
             println img            
           }
