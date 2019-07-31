@@ -10,7 +10,7 @@ node {
     def current_dir = pwd()
     def build_dir = io_op.getdir(tag, current_dir)
 
- docker.withRegistry('https://registry.example.com', 'credentials-id') {
+ docker.withRegistry('https://registry.hub.docker.com', 'admssa_dockerhub') {
     stage('Build') {
           println build_dir
           if (build_dir != null) {
@@ -19,6 +19,12 @@ node {
           }
         }
     }
-}
+    
+    stage('Tag latest and bush'){
+        if (build_dir != null) {
+            img.push()
+            img.push("${build-dir}-latest")
+        }
+    }
 
 } 
