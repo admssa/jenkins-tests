@@ -7,24 +7,28 @@ node {
     def tag_date = env.TAG_DATE
     def docker_repo = "admssa/diag"
     def io_op = load "jenkinslib/io_operations.groovy"
-    def current_dir = pwd()
-    def build_dir = io_op.getdir(tag, current_dir)
+    def build_dir = io_op.getdir(tag, pwd())
 
  docker.withRegistry('https://registry.hub.docker.com', 'admssa_dockerhub') {
-    stage('Build') {
+    stage('Build & push') {
           println build_dir
           if (build_dir != null) {
             def img = docker.build("${docker_repo}:${tag}", "-f ./${build_dir}/Dockerfile ./${build_dir}")  
-            ehco img            
+            img.push()
+            println img            
           }
         }
     }
-    
-    stage('Tag latest and bush'){
+
+    stage('Push latest tag'){
         if (build_dir != null) {
-            img.push()
-            img.push("${build-dir}-latest")
+            img.push("${build_dir}-latest")
         }
+    }
+
+    stage('Remove images') {
+        sh "docker rmi -f ${docker_repo}:${tag} || true"
+        sh "docker rmi -f ${docker_repo}:${build_dir}-latest || true"
     }
 
 } 
