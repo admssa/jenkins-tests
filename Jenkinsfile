@@ -1,14 +1,12 @@
 node {
     try {
-        def img = null
-        def io_op = load "jenkinslib/io_operations.groovy"
-        def docker_repo = "admssa/diag"
-        def tag = env.TAG_NAME
-
         stage('Git checkout current tag'){
             checkout scm
         }
-
+        def img = null
+        def docker_repo = "admssa/diag"
+        def tag = env.TAG_NAME
+        def io_op = load "jenkinslib/io_operations.groovy"
         def build_dir = io_op.getDir(tag, pwd())
 
         docker.withRegistry('', 'admssa_dockerhub') {
@@ -18,13 +16,11 @@ node {
                     img.push()
                 }
             }
-
             stage('Scan for vulnerabilities') {
                 def iamge_name = "${docker_repo}:${tag}"
                 writeFile file: 'anchore_images', text: iamge_name
                 anchore autoSubscribeTagUpdates: false, engineCredentialsId: 'anchore_admin', engineurl: 'http://docker-host:8228/v1', forceAnalyze: true, name: 'anchore_images'
             }
-
             stage('Push latest tag'){
                 echo sh(script: 'env|sort', returnStdout: true)
                 if (build_dir != null) {
