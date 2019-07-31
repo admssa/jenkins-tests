@@ -12,16 +12,24 @@ node {
 
  docker.withRegistry('', 'admssa_dockerhub') {
     stage('Build & push') {
-          println build_dir
           if (build_dir != null) {
-            img = docker.build("${docker_repo}:${tag}", "-f ./${build_dir}/Dockerfile ./${build_dir}")  
-            img.push()
-            println img            
+            try {
+                img = docker.build("${docker_repo}:${tag}", "-f ./${build_dir}/Dockerfile ./${build_dir}")  
+                img.push()
+            }   
+            catch (e) {
+                echo "Fail during image building: ${e}"
+                currentBuild.result = 'FAILURE'
+            }
+            finally {
+                sh 'docker rmi -f $(docker images -f "dangling=true" -q)  || true'
+            }            
           }
         }
     }
 
     stage('Push latest tag'){
+        echo sh(script: 'env|sort', returnStdout: true)
         if (build_dir != null) {
             img.push("${build_dir}-latest")
         }
