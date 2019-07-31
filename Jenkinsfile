@@ -30,7 +30,7 @@ node {
 
     stage ('Scan for vulnerabilities') {
         def iamge_name = "${docker_repo}:${tag}"
-        writeFile file: 'anchore_images', text: imageLine
+        writeFile file: 'anchore_images', text: iamge_name
         anchore autoSubscribeTagUpdates: false, engineCredentialsId: 'anchore_admin', engineurl: 'http://docker-host:8228/v1', forceAnalyze: true, name: 'anchore_images'
     }
 
