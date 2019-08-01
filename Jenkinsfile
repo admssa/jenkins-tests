@@ -20,12 +20,12 @@ node {
         }
         stage('Scan for vulnerabilities') {
             def iamge_name = "${local_registry}/${docker_repository}:${tag}"
-            def anchore_timeout = 300
+            def anchore_timeout = '300'
             if ('notebook' in tag) {
-                anchore_timeout = 3600
+                anchore_timeout = '3600'
             }
             writeFile file: 'anchore_images', text: iamge_name
-            anchore engineRetries: anchore_timeout, autoSubscribeTagUpdates: false, engineCredentialsId: 'anchore_admin', engineurl: 'http://docker-host:8228/v1', forceAnalyze: true, name: 'anchore_images'
+            anchore autoSubscribeTagUpdates: false, engineCredentialsId: 'anchore_admin', engineurl: 'http://docker-host:8228/v1', engineRetries: anchore_timeout, forceAnalyze: true, name: 'anchore_images'
         }
         stage('Push to the dockerhub'){ 
             if (build_directory != null) {
