@@ -12,6 +12,11 @@ def delete_by_tag(registry, repository, tag){
             if (http_client.responseCode == 202) {
                 result = true
             }
+            else {
+                println(url)
+                println "Image hasn't removed ${http_client.responseCode}\Debug: ${http_client}"
+                
+                }
         }
         catch (Exception e) {
             println(e)
