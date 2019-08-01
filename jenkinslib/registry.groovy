@@ -1,11 +1,10 @@
 def delete_by_tag(registry, repository, tag){
     def digest = get_digest(registry, repository, tag)
     def result = false
-    def http_client = new URL(url)
+    def http_client = new URL(url).openConnection()
     if (digest != null ){
         def url = String.format("http://%s/v2/%s/manifests/%s",registry,repository,digest)
         try {
-            http_client.openConnection()
             http_client.setRequestMethod('DELETE')
             http_client.setConnectTimeout(5000)
             http_client.setRequestProperty("Accept", "application/vnd.docker.distribution.manifest.v2+json")
@@ -19,7 +18,9 @@ def delete_by_tag(registry, repository, tag){
             throw e
         }
         finally{
-            http_client.close()
+            if (http_client != null) {
+            http_client.disconnect();
+            }
         }
     }
     return result
@@ -28,12 +29,11 @@ def delete_by_tag(registry, repository, tag){
 def get_digest(registry, repository, tag){
     def url = String.format("http://%s/v2/%s/manifests/%s",registry,repository,tag)
     def responce = null
-    def http_client = new URL(url)
+    def http_client = new URL(url).openConnection()
     try {
-        http_client.openConnection()
         http_client.setRequestMethod('GET')
-        http_client.connect()
         http_client.setConnectTimeout(5000)
+        http_client.connect()
         if (http_client.responseCode == 200) { 
             responce = http_client.getHeaderField("Docker-Content-Digest");
     }
@@ -46,7 +46,11 @@ def get_digest(registry, repository, tag){
         throw e
     }
     finally{
-        http_client.close()
+        if (http_client != null) {
+        http_client.disconnect();
+        }
+    }
+    
     }
     return responce
 }
