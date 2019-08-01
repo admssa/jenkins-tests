@@ -49,9 +49,7 @@ def get_digest(registry, repository, tag){
         if (http_client != null) {
         http_client.disconnect();
         }
-    }
-    
-    }
+    }   
     return responce
 }
 
