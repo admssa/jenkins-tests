@@ -37,6 +37,7 @@ def get_digest(registry, repository, tag){
     def http_client = new URL(url).openConnection()
     try {
         http_client.setRequestMethod('GET')
+        http_client.setRequestProperty("Accept", "application/vnd.docker.distribution.manifest.v2+json")
         http_client.setConnectTimeout(5000)
         http_client.connect()
         if (http_client.responseCode == 200) { 
