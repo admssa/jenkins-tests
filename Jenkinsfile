@@ -34,7 +34,7 @@ node {
         }
         stage('Removing from the local registry'){
             println "Removing image manifest from the local registry"
-            def registry = load "jenkinslib/io_operations.groovy"
+            def registry = load "jenkinslib/registry.groovy"
             if( registry.delete_by_tag(local_registry, docker_repository, tag) == false ){
                 currentBuild.result = 'UNSTABLE'
             }
