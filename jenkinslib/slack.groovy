@@ -53,3 +53,4 @@ def sendToSlack(buildResult, slack_channel, msg, title){
         sendSlackNetral(slack_channel, msg, title)
     }
 }
+return this
