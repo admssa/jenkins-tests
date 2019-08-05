@@ -6,7 +6,7 @@ def runBuild(repo_dir){
         def local_registry    = "docker-host:65534"
         def tag               = env.TAG_NAME
         def io_operations     = load "jenkinslib/io_operations.groovy"
-        def slack             = load "jenkinslib/slack.gtoovy"
+        def slack             = load "jenkinslib/slack.groovy"
         def slack_channel     = "#jenkins-automation"
         def build_directory   = io_operations.getDir(tag, repo_dir)
 
