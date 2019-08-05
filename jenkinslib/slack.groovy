@@ -7,7 +7,6 @@ def sendSlackFields(slack_channel, msg, title, color, field_list) {
     attachment.put('text', msg.toString());
     attachment.put('title', title.toString());
     attachment.put('color', color.toString());
-    attachment.put('footer', 'UTC: ' + getDateNow());
     attachment.put('mrkdwn_in', ['fields'])
     if (field_list != null && field_list.size() > 0) {
       attachment.put('fields', field_list);
@@ -53,4 +52,5 @@ def sendToSlack(buildResult, slack_channel, msg, title){
         sendSlackNetral(slack_channel, msg, title)
     }
 }
+
 return this
