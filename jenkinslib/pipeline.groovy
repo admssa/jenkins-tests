@@ -10,7 +10,7 @@ def runBuild(repo_dir){
         def slack_channel     = "#jenkins-automation"
         def build_directory   = io_operations.getDir(tag, repo_dir)
 
-    slack.sendToSlack('STARTED', "${env.JOB_NAME}", msg_title)
+    slack.sendToSlack('STARTED', slack_channel, "${env.JOB_NAME}", msg_title)
 
     if (build_directory != null) {
         stage('Build & push locally') {  
