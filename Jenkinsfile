@@ -3,36 +3,50 @@ node {
         stage('Git checkout current tag'){
             checkout scm
         }
-        def img = null
-        def docker_repo = "admssa/diag"
-        def tag = env.TAG_NAME
-        def io_op = load "jenkinslib/io_operations.groovy"
-        def build_dir = io_op.getDir(tag, pwd())
+        def img               = null
+        def docker_repository = "admssa/diag"
+        def local_registry    = "docker-host:65534"
+        def tag               = env.TAG_NAME
+        def io_operations     = load "jenkinslib/io_operations.groovy"
+        def build_directory   = io_operations.getDir(tag, pwd())
 
-        docker.withRegistry('', 'admssa_dockerhub') {
-            stage('Build & push') {
-                if (build_dir != null) {
-                    img = docker.build("${docker_repo}:${tag}", "-f ./${build_dir}/Dockerfile ./${build_dir}")
-                    img.push()
-                }
+    if (build_directory != null) {
+        stage('Build & push locally') {  
+            img = docker.build("${docker_repository}:${tag}", "-f ./${build_directory}/Dockerfile ./${build_directory}")
+            docker.withRegistry("http://${local_registry}"){ 
+              img.push()
             }
-            stage('Scan for vulnerabilities') {
-                def iamge_name = "${docker_repo}:${tag}"
-                writeFile file: 'anchore_images', text: iamge_name
-                anchore autoSubscribeTagUpdates: false, engineCredentialsId: 'anchore_admin', engineurl: 'http://docker-host:8228/v1', forceAnalyze: true, name: 'anchore_images'
+        }
+        stage('Scan for vulnerabilities') {
+            def iamge_name        = "${local_registry}/${docker_repository}:${tag}"
+            def anchore_timeout = '300'
+            if ('notebook' in tag) {
+                anchore_timeout = '3600'
             }
-            stage('Push latest tag'){
-                echo sh(script: 'env|sort', returnStdout: true)
-                if (build_dir != null) {
-                    img.push("${build_dir}-latest")
-                }
+            writeFile file: 'anchore_images', text: iamge_name
+            anchore autoSubscribeTagUpdates: false, engineCredentialsId: 'anchore_admin', engineurl: 'http://docker-host:8228/v1', engineRetries: anchore_timeout, forceAnalyze: true, name: 'anchore_images'
+        }
+        stage('Push to the dockerhub'){ 
+            docker.withRegistry('', 'admssa_dockerhub') { 
+                img.push()
+                img.push("${build_directory}-latest")
+            }
+        }
+        stage('Removing from the local registry'){
+            println "Removing image manifest from the local registry"
+            def registry = load "jenkinslib/registry.groovy"
+            if( registry.delete_by_tag(local_registry, docker_repository, tag) == false ){
+                currentBuild.result = 'UNSTABLE'
             }
         }
         stage('Remove images') {
-            sh "docker rmi -f ${docker_repo}:${tag} || true"
-            sh "docker rmi -f ${docker_repo}:${build_dir}-latest || true"
+            sh "docker rmi ${docker_repository}:${tag} || true"
+            sh "docker rmi ${docker_repository}:${build_directory}-latest || true"
+            sh "docker rmi ${local_registry}/${docker_repository}:${tag} || true"
+            sh "docker rmi ${local_registry}/${docker_repository}:${build_directory}-latest || true"
         }
 
+    }
     }
     catch (e) {
         echo "Pipeline failed: ${e}"
