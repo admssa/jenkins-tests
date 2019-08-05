@@ -1,16 +1,16 @@
 def runBuild(repo_dir){
+  def msg_title         = "Datalabs images build"
+  def img               = null
+  def docker_repository = "admssa/diag"
+  def local_registry    = "docker-host:65534"
+  def tag               = env.TAG_NAME
+  def io_operations     = load "jenkinslib/io_operations.groovy"
+  def slack             = load "jenkinslib/slack.groovy"
+  def slack_channel     = "#jenkins-automation"
+        
   try {   
-        def msg_title         = "Datalabs images build"
-        def img               = null
-        def docker_repository = "admssa/diag"
-        def local_registry    = "docker-host:65534"
-        def tag               = env.TAG_NAME
-        def io_operations     = load "jenkinslib/io_operations.groovy"
-        def slack             = load "jenkinslib/slack.groovy"
-        def slack_channel     = "#jenkins-automation"
-        def build_directory   = io_operations.getDir(tag, repo_dir)
-
-    slack.sendToSlack('STARTED', slack_channel, "${env.JOB_NAME}", msg_title)
+    def build_directory   = io_operations.getDir(tag, repo_dir)  
+    slack.sendToSlack('STARTED', slack_channel, "Starting build job: ${env.JOB_NAME}", msg_title)
 
     if (build_directory != null) {
         stage('Build & push locally') {  
