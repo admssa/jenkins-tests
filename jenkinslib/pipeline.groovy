@@ -5,13 +5,13 @@ def runBuild(repo_dir){
         def docker_repository = "admssa/diag"
         def local_registry    = "docker-host:65534"
         def tag               = env.TAG_NAME
-        def io_operations     = load "io_operations.groovy"
+        def io_operations     = load "jenkinslib/io_operations.groovy"
         def slack             = load "slack.gtoovy"
         def slack_channel     = "#jenkins-automation"
         def build_directory   = io_operations.getDir(tag, repo_dir)
 
     slack.sendToSlack('STARTED', "${env.JOB_NAME}", msg_title)
-    
+
     if (build_directory != null) {
         stage('Build & push locally') {  
             img = docker.build("${docker_repository}:${tag}", "-f ./${build_directory}/Dockerfile ./${build_directory}")
@@ -34,7 +34,7 @@ def runBuild(repo_dir){
         }
         stage('Removing from the local registry'){
             println "Removing image manifest from the local registry"
-            def registry = load "registry.groovy"
+            def registry = load "jenkinslib/registry.groovy"
             if( registry.deleteByTag(local_registry, docker_repository, tag) == false ){
                 currentBuild.result = 'UNSTABLE'
             }
