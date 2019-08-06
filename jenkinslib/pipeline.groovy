@@ -1,16 +1,15 @@
-def runBuild(repo_dir){
-  def msg_title         = "Datalabs images build"
+def runBuild(repo_dir, slack, slack_channel, msg_title){
+  
   def img               = null
   def docker_repository = "admssa/diag"
   def local_registry    = "docker-host:65534"
   def tag               = env.TAG_NAME
-  def io_operations     = load "jenkinslib/io_operations.groovy"
-  def slack             = load "jenkinslib/slack.groovy"
-  def slack_channel     = "#jenkins-automation"
+
         
   try {   
+    def io_operations     = load "jenkinslib/io_operations.groovy"  
     def build_directory   = io_operations.getDir(tag, repo_dir)  
-    slack.sendToSlack('STARTED', slack_channel, "Starting build job: ${env.JOB_NAME}", msg_title)
+    
 
     if (build_directory != null) {
         stage('Build & push locally') {  
@@ -44,6 +43,7 @@ def runBuild(repo_dir){
             sh "docker rmi ${docker_repository}:${build_directory}-latest || true"
             sh "docker rmi ${local_registry}/${docker_repository}:${tag} || true"
             sh "docker rmi ${local_registry}/${docker_repository}:${build_directory}-latest || true"
+        
         }
     }
     }
@@ -56,10 +56,6 @@ def runBuild(repo_dir){
     finally {
         sh 'docker rmi -f $(docker images -f "dangling=true" -q)  || true'
     }
-
-    slack.sendToSlack(currentBuild.result, slack_channel, "${env.JOB_NAME}.\nJobURL:${env.BUILD_URL}.", msg_title)
-    
-    
 
 }
 

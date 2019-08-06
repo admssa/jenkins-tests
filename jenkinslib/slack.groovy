@@ -39,13 +39,18 @@ def sendSlackNetral(slack_channel, msg, title) {
 }
 
 def sendToSlack(buildResult, slack_channel, msg, title){
+    default_message = "Job: ${env.JOB_NAME} was %s\n%s\nJobURL: ${env.BUILD_URL}"
+    def full_message = null
     if (buildResult == 'SUCCESS'){
-        sendSlackSuccess(slack_channel, msg, title)
+        full_message = String.format(default_message, "finished successfuly", msg)
+        sendSlackSuccess(slack_channel, full_message, title)
     }
     else if (buildResult == 'UNSTABLE'){
+        full_message = String.format(default_message, "unstable", msg)
         sendSlackWarning(slack_channel, msg, title)
     }
     else if (buildResult == 'FAILURE'){
+        full_message = String.format(default_message, "failed", msg)
         sendSlackError(slack_channel, msg, title)
     }
     else{
