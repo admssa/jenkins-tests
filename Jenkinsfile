@@ -8,8 +8,8 @@ node {
 
     slack.sendToSlack('STARTED', slack_channel, "Starting build job: ${env.JOB_NAME}", msg_title)
     
-    pipeline.runBuild(pwd(),slack, slack_channel, msg_title)
+    def image = pipeline.runBuild(pwd(),slack, slack_channel, msg_title)
 
-    slack.sendToSlack(currentBuild.result, "No additional output", msg_title)
+    slack.sendToSlack(currentBuild.result, slack_channel, image, msg_title)
     
 } 

@@ -56,6 +56,7 @@ def runBuild(repo_dir, slack, slack_channel, msg_title){
     finally {
         sh 'docker rmi -f $(docker images -f "dangling=true" -q)  || true'
     }
+    return String.format("%s:%s", docker_repository, tag)
 
 }
 
