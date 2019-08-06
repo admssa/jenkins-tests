@@ -1,4 +1,4 @@
-def runBuild(repo_dir, slack, slack_channel, msg_title){
+def runBuild(repo_dir){
   
   def img               = null
   def docker_repository = "admssa/diag"
