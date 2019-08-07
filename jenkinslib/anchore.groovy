@@ -23,7 +23,7 @@ def getRequest(url){
             responce = http_client.getInputStream().getText()
         }
         else {
-            println String.format("Error %s while requesting $s\n%s", resp_code, url, http_client.getInputStream().getText())
+            println String.format("Error %s while requesting %s\n%s", resp_code, url, http_client.getInputStream().getText())
         }
         }
     catch (Exception e) {
