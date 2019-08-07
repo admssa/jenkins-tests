@@ -4,7 +4,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 def generatePlainReport(image, engine_url){
-    url = String.format("%s/images/%s/content", v1, image)
+    url = String.format("%s/images/%s/content", engine_url, image)
     def resp = getRequest(url)
     return resp
 
