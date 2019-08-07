@@ -13,7 +13,7 @@ def runBuild(repo_dir){
         
   try {   
     def build_directory   = io_operations.getDir(tag, repo_dir)  
-    // slack.sendToSlack('STARTED', slack_channel, "Starting build job: ${env.JOB_NAME}", msg_title)
+    slack.sendToSlack('STARTED', slack_channel, "Starting build job: ${env.JOB_NAME}", msg_title)
     if (build_directory != null) {
         stage('Build & push locally') {  
             img = docker.build("${docker_repository}:${tag}", "-f ./${build_directory}/Dockerfile ./${build_directory}")
@@ -35,9 +35,8 @@ def runBuild(repo_dir){
             withCredentials([usernamePassword(credentialsId: 'anchore_admin', usernameVariable: 'ANCHORE_CLI_USER', passwordVariable: 'ANCHORE_CLI_PASS')]) {
                 short_report = anchore_script.generatePlainReport(iamge_name, engine_url) 
             }
-            println short_report  
-            println short_report.status            
-            if (short_report == null || short_report != 'pass'){
+            println short_report         
+            if (short_report == null || short_report.status != 'pass'){
                 currentBuild.result = 'FAILURE'
                 error("Anchore: Image didn't pass the check")
             }
@@ -67,12 +66,12 @@ def runBuild(repo_dir){
     catch (e) {
         echo "Pipeline failed: ${e}"
         currentBuild.result = 'FAILURE'
-        // slack.sendSlackError(slack_channel, "Exception ${e} while running build: ${env.BUILD_URL}console", msg_title)
+        slack.sendSlackError(slack_channel, "Exception ${e} while running build: ${env.BUILD_URL}console", msg_title)
     }
     finally {
         sh 'docker rmi -f $(docker images -f "dangling=true" -q)  || true'
         def currentResult = currentBuild.result ?: 'SUCCESS'
-        // slack.sendToSlack(currentResult, slack_channel, String.format("%s:%s", docker_repository, tag), msg_title)
+        slack.sendToSlack(currentResult, slack_channel, String.format("%s:%s\n%s", docker_repository, tag, short_report), msg_title)
     }
 }
 
