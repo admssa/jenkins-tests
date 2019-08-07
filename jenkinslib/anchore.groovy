@@ -6,7 +6,7 @@ def generatePlainReport(image, engine_url){
     vuln_types  = ["os", "non-os"]
     vuln_levels = ["Low", "Medium", "High", "Negligible"]
     //require IMAGE, VULN_TYPE, VULN_LEVEL
-    get_vulns = "anchore-cli image vulns %s %s | grep %s | awk '\${print $2}' sort | uniq | wc -l"
+    get_vulns = "anchore-cli image vulns %s %s | grep %s | awk '{print \$2}' sort | uniq | wc -l"
     //require IMAGE
     get_stoppers = "anchore-cli evaluate check s% --detail | grep stop"
     JSONObject unic_vulns = new JSONObject()
