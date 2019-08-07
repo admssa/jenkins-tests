@@ -45,11 +45,11 @@ def sendToSlack(buildResult, slack_channel, msg, title, short_report=null){
     if (short_report != null){
         fields = []
         for ( e in short_report ) {
-            fields.add(new JsonSlurperClassic().parseText("""{"title": "${e.key}", "value": "${e.value}", "short":"false"}"""))
+            fields.add(new JsonSlurperClassic().parseText("""{"title": "${e.key}", "value": "${e.value}", "short": "false"}"""))
      }
     }
 
-    default_message = "Job ${env.JOB_NAME} was %s\n%s\nJobURL: ${env.BUILD_URL}"
+    default_message = "*<${env.BUILD_URL}|Job ${env.JOB_NAME}> was %s\n%s*"
     def full_message = null
     if (buildResult == 'SUCCESS'){
         full_message = String.format(default_message, "finished successfully", msg)
