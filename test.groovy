@@ -1,5 +1,28 @@
 #!groovy
 
-def lib =  load("jenkinslib/io_operations.groovy")
+import groovy.json.JsonSlurperClassic;
 
- result = lib.getdir("tag0-test-8.6-1")
+
+
+def jsonString = '{"status":"pass","os":{"Low":"0","Medium":"0","High":"0","Negligible":"0"},"non-os":{"Low":"0","Medium":"0","High":"0","Negligible":"0"}}'
+
+def json = new JsonSlurperClassic().parseText(jsonString)
+
+
+for ( e in json ) {
+    println "key = ${e.key}, value = ${e.value}"
+}
+
+def fieldList = []
+for ( e in json ) {
+   fieldList.add(new JsonSlurperClassic().parseText("""{"title": "${e.key}", "value": "${e.value}", "short":"false"}"""))
+}
+
+for (i in fieldList){
+    println i
+}
+
+def say(msg='Hello',name='world') {
+   println "$msg $name!"
+}
+say("test")
