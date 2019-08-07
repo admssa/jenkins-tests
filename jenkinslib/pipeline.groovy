@@ -30,7 +30,7 @@ def runBuild(repo_dir){
             writeFile file: 'anchore_images', text: iamge_name
             anchore bailOnFail: false, autoSubscribeTagUpdates: false, engineCredentialsId: 'anchore_admin', engineurl: 'http://docker-host:8228/v1', engineRetries: anchore_timeout, forceAnalyze: true, name: 'anchore_images'
             echo "Preparing reports before getting status of the check"
-            def test = anchore_script.generatePlainReport("${docker_repository}:${tag}","http://docker-host:8228/v1")               
+            def test = anchore_script.generatePlainReport(iamge_name, "http://docker-host:8228/v1")               
             println test
 
 

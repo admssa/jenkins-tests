@@ -1,42 +1,30 @@
 #!groovy
-
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 def generatePlainReport(image, engine_url){
-    url = String.format("%s/images/%s/content", engine_url, image)
-    def resp = getRequest(url)
-    return resp
 
-}
+    vuln_types  = ["os", "non-os"]
+    vuln_levels = ["Low", "Medium", "High", "Negligible"]
+    //require IMAGE, VULN_TYPE, VULN_LEVEL
+    get_vulns = "anchore-cli image vulns %s %s | grep %s | awk '\${print $2}' sort | uniq | wc -l"
+    //require IMAGE
+    get_stoppers = "anchore-cli evaluate check s% --detail | grep stop"
+    JSONObject unic_vulns = new JSONObject()
 
-def getRequest(url){
-    def responce = null
-    def http_client = null
-    try {
-        http_client =  new URL(url).openConnection()
-        http_client.setRequestMethod('GET')
-        http_client.setConnectTimeout(10)
-        http_client.connect()
-        resp_code = http_client.getResponseCode()
-        println resp_code
-        if ( resp_code == '200' || resp_code == '202'){
-            responce = http_client.getInputStream().getText()
+
+    for (type in vuln_levels){
+        def vulns_by_type = new JSONObject()
+        for (level in vuln_levels){
+            def cmd = String.format(get_vulns, image, type, level)
+            def number = sh script: cmd, returnStdout: true
+            vulns_by_type.put(level,number)
         }
-        else {
-            println String.format("Error %s while requesting %s\n%s", resp_code, url, http_client.getErrorStream().toString())
-        }
-        }
-    catch (Exception e) {
-        println(e)
-        throw e
+        unic_vulns.put(type,vulns_by_type)
     }
-    finally {
-        if (http_client != null) {
-            http_client.disconnect();
-        }
-    }
-    println "Returning ${responce}"
-    return responce  
+
+
+    return unic_vulns
+    
 }
 return this
+
