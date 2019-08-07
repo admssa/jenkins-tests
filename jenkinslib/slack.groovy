@@ -10,7 +10,9 @@ def sendSlackFields(slack_channel, msg, title, color, field_list) {
     attachment.put('color', color.toString());
     attachment.put('mrkdwn_in', ['fields']);
     if (field_list != null && field_list.size() > 0) {
+      attachment.put("type": "divider");  
       attachment.put('fields', field_list);
+      attachment.put("type": "divider");  
       println(field_list)
     }
     JSONArray attachments = new JSONArray();
@@ -49,7 +51,7 @@ def sendToSlack(buildResult, slack_channel, msg, title, short_report=null){
      }
     }
 
-    default_message = "Job: ${env.JOB_NAME} was %s\n%s\nJobURL: ${env.BUILD_URL}"
+    default_message = "Job ${env.JOB_NAME} was %s\n%s\nJobURL: ${env.BUILD_URL}"
     def full_message = null
     if (buildResult == 'SUCCESS'){
         full_message = String.format(default_message, "finished successfully", msg)
