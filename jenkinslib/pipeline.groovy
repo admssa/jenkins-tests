@@ -37,12 +37,12 @@ def runBuild(repo_dir){
             }
             println short_report  
             println short_report.status            
-            if (short_report == null || short_report['status'] != 'pass'){
-                println "Inside the if"
-                return
+            if (short_report == null || short_report != 'pass'){
+                currentBuild.result = 'FAILURE'
+                error("Anchore: Image didn't pass the check")
             }
-
         }
+
         stage('Push to the dockerhub'){ 
             docker.withRegistry('', 'admssa_dockerhub') { 
                 img.push()
