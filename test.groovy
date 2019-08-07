@@ -22,7 +22,7 @@ for (i in fieldList){
     println i
 }
 
-// def say(msg='Hello',name='world') {
-//    println "$msg $name!"
-// }
-// say("test")
+def say(msg='Hello',name='world') {
+   println "$msg $name!"
+}
+say("test")
