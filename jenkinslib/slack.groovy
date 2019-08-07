@@ -1,6 +1,7 @@
 #!groovy
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import groovy.json.JsonSlurper;
 
 def sendSlackFields(slack_channel, msg, title, color, field_list) {
     JSONObject attachment = new JSONObject();
