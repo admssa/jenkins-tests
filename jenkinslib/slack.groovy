@@ -1,7 +1,7 @@
 #!groovy
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import groovy.json.JsonSlurper;
+import groovy.json.JsonSlurperClassic;
 
 def sendSlackFields(slack_channel, msg, title, color, field_list) {
     JSONObject attachment = new JSONObject();
@@ -11,6 +11,7 @@ def sendSlackFields(slack_channel, msg, title, color, field_list) {
     attachment.put('mrkdwn_in', ['fields']);
     if (field_list != null && field_list.size() > 0) {
       attachment.put('fields', field_list);
+      println(field_list))
     }
     JSONArray attachments = new JSONArray();
     attachments.add(attachment);
@@ -43,9 +44,9 @@ def sendToSlack(buildResult, slack_channel, msg, title, short_report=null){
     def fields = null
     if (short_report != null){
         fields = []
-    for ( e in short_report ) {
-        fields.add(new JsonSlurper().parseText("""{"title": "${e.key}", "value": "${e.value}", "short":"false"}"""))
-    }
+        for ( e in short_report ) {
+            fields.add(new JsonSlurperClassic().parseText("""{"title": "${e.key}", "value": "${e.value}", "short":"false"}"""))
+     }
     }
 
     default_message = "Job: ${env.JOB_NAME} was %s\n%s\nJobURL: ${env.BUILD_URL}"
