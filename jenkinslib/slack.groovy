@@ -24,19 +24,19 @@ def sendSlackNotification(slack_channel, msg, title, color, fields=null) {
 }
 
 def sendSlackError(slack_channel, msg, title, fields=null) {
-    sendSlackNotification(slack_channel, msg, title, 'danger')
+    sendSlackNotification(slack_channel, msg, title, 'danger', fields)
 }
 
 def sendSlackWarning(slack_channel, msg, title, fields=null) {
-    sendSlackNotification(slack_channel, msg, title, 'warning')
+    sendSlackNotification(slack_channel, msg, title, 'warning', fields)
 }
 
 def sendSlackSuccess(slack_channel, msg, title, fields=null) {
-    sendSlackNotification(slack_channel, msg, title, 'good')
+    sendSlackNotification(slack_channel, msg, title, 'good', fields)
 }
 
 def sendSlackNetral(slack_channel, msg, title, fields=null) {
-    sendSlackNotification(slack_channel, msg, title, '#439FE0')
+    sendSlackNotification(slack_channel, msg, title, '#439FE0', fields)
 }
 
 def sendToSlack(buildResult, slack_channel, msg, title, short_report=null){
