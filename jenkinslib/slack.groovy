@@ -20,23 +20,23 @@ def sendSlackFields(slack_channel, msg, title, color, field_list) {
         attachments: attachments.toString()
 }
 
-def sendSlackNotification(slack_channel, msg, title, color, fields=null) {
+def sendSlackNotification(slack_channel, msg, title, color, fields) {
     sendSlackFields(slack_channel, msg, title, color, fields)
 }
 
-def sendSlackError(slack_channel, msg, title, fields=null) {
+def sendSlackError(slack_channel, msg, title, fields) {
     sendSlackNotification(slack_channel, msg, title, 'danger', fields)
 }
 
-def sendSlackWarning(slack_channel, msg, title, fields=null) {
+def sendSlackWarning(slack_channel, msg, title, fields) {
     sendSlackNotification(slack_channel, msg, title, 'warning', fields)
 }
 
-def sendSlackSuccess(slack_channel, msg, title, fields=null) {
+def sendSlackSuccess(slack_channel, msg, title, fields) {
     sendSlackNotification(slack_channel, msg, title, 'good', fields)
 }
 
-def sendSlackNetral(slack_channel, msg, title, fields=null) {
+def sendSlackNetral(slack_channel, msg, title, fields) {
     sendSlackNotification(slack_channel, msg, title, '#439FE0', fields)
 }
 
@@ -52,13 +52,13 @@ def sendToSlack(buildResult, slack_channel, msg, title, short_report=null){
     default_message = "Job: ${env.JOB_NAME} was %s\n%s\nJobURL: ${env.BUILD_URL}"
     def full_message = null
     if (buildResult == 'SUCCESS'){
-        full_message = String.format(default_message, "finished successfully", msg, fields)
-        sendSlackSuccess(slack_channel, full_message, title)
+        full_message = String.format(default_message, "finished successfully", msg)
+        sendSlackSuccess(slack_channel, full_message, title,  fields)
     } else if (buildResult == 'UNSTABLE'){
-        full_message = String.format(default_message, "unstable", msg, fields)
-        sendSlackWarning(slack_channel, full_message, title)
+        full_message = String.format(default_message, "unstable", msg)
+        sendSlackWarning(slack_channel, full_message, title,  fields)
     } else if (buildResult == 'FAILURE'){
-        full_message = String.format(default_message, "failed", msg, fields)
+        full_message = String.format(default_message, "failed", msg)
         sendSlackError(slack_channel, full_message, title, fields)
     } 
     else{
