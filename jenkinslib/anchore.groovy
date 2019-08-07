@@ -19,7 +19,7 @@ def getRequest(url){
         http_client.setConnectTimeout(10)
         http_client.connect()
         resp_code = http_client.getResponseCode()
-        if ( resp_code == '200' or resp_code == '202'){
+        if ( resp_code == '200' || resp_code == '202'){
             responce = http_client.getInputStream().getText()
         }
         else {
