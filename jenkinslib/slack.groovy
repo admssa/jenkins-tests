@@ -23,23 +23,23 @@ def sendSlackNotification(slack_channel, msg, title, color, fields=null) {
     sendSlackFields(slack_channel, msg, title, color, fields)
 }
 
-def sendSlackError(slack_channel, msg, title, fields) {
+def sendSlackError(slack_channel, msg, title, fields=null) {
     sendSlackNotification(slack_channel, msg, title, 'danger')
 }
 
-def sendSlackWarning(slack_channel, msg, title, fields) {
+def sendSlackWarning(slack_channel, msg, title, fields=null) {
     sendSlackNotification(slack_channel, msg, title, 'warning')
 }
 
-def sendSlackSuccess(slack_channel, msg, title, fields) {
+def sendSlackSuccess(slack_channel, msg, title, fields=null) {
     sendSlackNotification(slack_channel, msg, title, 'good')
 }
 
-def sendSlackNetral(slack_channel, msg, title, fields) {
+def sendSlackNetral(slack_channel, msg, title, fields=null) {
     sendSlackNotification(slack_channel, msg, title, '#439FE0')
 }
 
-def sendToSlack(buildResult, slack_channel, msg, title, fields, short_report=null){
+def sendToSlack(buildResult, slack_channel, msg, title, short_report=null){
     def fields = null
     if (short_report != null){
         fields = []
