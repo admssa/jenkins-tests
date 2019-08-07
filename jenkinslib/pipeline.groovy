@@ -37,7 +37,7 @@ def runBuild(repo_dir){
             }
             println short_report         
             if (short_report == null || short_report.status != 'pass'){
-                short_report.put("image", "${docker_repository}:${tag}"))
+                short_report.put("image", "${docker_repository}:${tag}")
                 currentBuild.result = 'FAILURE'
                 error("Anchore: Image didn't pass the check")
             }
