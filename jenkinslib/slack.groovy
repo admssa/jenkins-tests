@@ -10,7 +10,6 @@ def sendSlackFields(slack_channel, msg, title, color, field_list) {
     attachment.put('color', color.toString());
     attachment.put('mrkdwn_in', ['fields']);
     if (field_list != null && field_list.size() > 0) {
-      attachment.put('type': 'divider');  
       attachment.put('fields', field_list);
       println(field_list)
     }
