@@ -71,7 +71,7 @@ def runBuild(repo_dir){
     finally {
         sh 'docker rmi -f $(docker images -f "dangling=true" -q)  || true'
         def currentResult = currentBuild.result ?: 'SUCCESS'
-        slack.sendToSlack(currentResult, slack_channel, String.format("%s:%s\n%s", docker_repository, tag), msg_title, short_report)
+        slack.sendToSlack(currentResult, slack_channel, String.format("%s:%s", docker_repository, tag), msg_title, short_report)
     }
 }
 
