@@ -12,7 +12,6 @@ def sendSlackFields(slack_channel, msg, title, color, field_list) {
     if (field_list != null && field_list.size() > 0) {
       attachment.put('type': 'divider');  
       attachment.put('fields', field_list);
-      attachment.put('type': 'divider');  
       println(field_list)
     }
     JSONArray attachments = new JSONArray();
