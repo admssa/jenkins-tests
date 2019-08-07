@@ -24,14 +24,17 @@ def runBuild(repo_dir){
         stage('Scan for vulnerabilities') {
             def anchore_script  = load "jenkinslib/anchore.groovy"
             def iamge_name      = "${local_registry}/${docker_repository}:${tag}"
+            def engine_url      = "http://docker-host:8228/v1"
             def anchore_timeout = '3600'
             if ('jupyter' in tag) {
                 anchore_timeout = '10800'
             }
             writeFile file: 'anchore_images', text: iamge_name
-            anchore bailOnFail: false, autoSubscribeTagUpdates: false, engineCredentialsId: 'anchore_admin', engineurl: 'http://docker-host:8228/v1', engineRetries: anchore_timeout, forceAnalyze: true, name: 'anchore_images'
+            anchore bailOnFail: false, autoSubscribeTagUpdates: false, engineCredentialsId: 'anchore_admin', engineurl: engine_url, engineRetries: anchore_timeout, forceAnalyze: true, name: 'anchore_images'
             echo "Preparing reports before getting status of the check"
-            short_report = anchore_script.generatePlainReport(iamge_name) 
+            withCredentials([usernamePassword(credentialsId: 'anchore_admin', usernameVariable: 'ANCHORE_CLI_USER', passwordVariable: 'ANCHORE_CLI_PASS')]) {
+                short_report = anchore_script.generatePlainReport(iamge_name, engine_url) 
+            }
             println short_report              
             if (short_report != null && short_report.status == 'fail'){
                 return

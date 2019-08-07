@@ -1,13 +1,13 @@
 #!groovy
 import net.sf.json.JSONObject;
 
-def generatePlainReport(image){
+def generatePlainReport(image, engine_url){
 
     def vuln_types     = ["os", "non-os"]
     def vuln_levels    = ["Low", "Medium", "High", "Negligible"]
     //require IMAGE, VULN_TYPE, VULN_LEVEL
-    def get_vulns      = """anchore-cli image vuln %s %s | grep %s | awk '{print \$2}' | sort | uniq | wc -l"""
-    def get_status_cmd = String.format("""anchore-cli evaluate check %s | grep Status | awk '{print \$2}'""",image)
+    def get_vulns      = """anchore-cli --url ${engine_url} image vuln %s %s | grep %s | awk '{print \$2}' | sort | uniq | wc -l"""
+    def get_status_cmd = String.format("""anchore-cli  --url ${engine_url} evaluate check %s | grep Status | awk '{print \$2}'""", image)
     JSONObject report  = new JSONObject()
 
     def status = sh script: get_status_cmd, returnStdout: true
