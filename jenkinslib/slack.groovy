@@ -46,10 +46,10 @@ def sendToSlack(buildResult, slack_channel, msg, title){
         sendSlackSuccess(slack_channel, full_message, title)
     } else if (buildResult == 'UNSTABLE'){
         full_message = String.format(default_message, "unstable", msg)
-        sendSlackWarning(slack_channel, msg, title)
+        sendSlackWarning(slack_channel, full_message, title)
     } else if (buildResult == 'FAILURE'){
         full_message = String.format(default_message, "failed", msg)
-        sendSlackError(slack_channel, msg, title)
+        sendSlackError(slack_channel, full_message, title)
     } 
     else{
         sendSlackNetral(slack_channel, msg, title)

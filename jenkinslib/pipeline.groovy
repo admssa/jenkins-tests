@@ -1,6 +1,7 @@
 def runBuild(repo_dir){
   
   def img               = null
+  def fields_list       = null
   def docker_repository = "admssa/diag"
   def local_registry    = "docker-host:65534"
   def tag               = env.TAG_NAME
@@ -11,8 +12,7 @@ def runBuild(repo_dir){
         
   try {   
     def build_directory   = io_operations.getDir(tag, repo_dir)  
-    slack.sendToSlack('STARTED', slack_channel, "Starting build job: ${env.JOB_NAME}", msg_title)
-
+    // slack.sendToSlack('STARTED', slack_channel, "Starting build job: ${env.JOB_NAME}", msg_title)
     if (build_directory != null) {
         stage('Build & push locally') {  
             img = docker.build("${docker_repository}:${tag}", "-f ./${build_directory}/Dockerfile ./${build_directory}")
@@ -21,11 +21,20 @@ def runBuild(repo_dir){
             }
         }
         stage('Scan for vulnerabilities') {
+            def anchore_script  = load "jenkinslib/anchore.groovy"
             def iamge_name      = "${local_registry}/${docker_repository}:${tag}"
-            def anchore_timeout = '7200'
-
+            def anchore_timeout = '3600'
+            if ('jupyter' in tag) {
+                anchore_timeout = '10800'
+            }
             writeFile file: 'anchore_images', text: iamge_name
-            anchore autoSubscribeTagUpdates: false, engineCredentialsId: 'anchore_admin', engineurl: 'http://docker-host:8228/v1', engineRetries: anchore_timeout, forceAnalyze: true, name: 'anchore_images'
+            anchore bailOnFail: false, autoSubscribeTagUpdates: false, engineCredentialsId: 'anchore_admin', engineurl: 'http://docker-host:8228/v1', engineRetries: anchore_timeout, forceAnalyze: true, name: 'anchore_images'
+            echo "Preparing reports before getting status of the check"
+            def test = anchore_script.generatePlainReport("${docker_repository}:${tag}","http://docker-host:8228/v1")               
+            println test
+
+
+
         }
         stage('Push to the dockerhub'){ 
             docker.withRegistry('', 'admssa_dockerhub') { 
@@ -45,22 +54,19 @@ def runBuild(repo_dir){
             sh "docker rmi ${docker_repository}:${build_directory}-latest || true"
             sh "docker rmi ${local_registry}/${docker_repository}:${tag} || true"
             sh "docker rmi ${local_registry}/${docker_repository}:${build_directory}-latest || true"
-        
         }
     }
     }
     catch (e) {
         echo "Pipeline failed: ${e}"
         currentBuild.result = 'FAILURE'
-        slack.sendSlackError(slack_channel, "Exception ${e} while running build: ${env.BUILD_URL}console", msg_title)
-
+        // slack.sendSlackError(slack_channel, "Exception ${e} while running build: ${env.BUILD_URL}console", msg_title)
     }
     finally {
         sh 'docker rmi -f $(docker images -f "dangling=true" -q)  || true'
         def currentResult = currentBuild.result ?: 'SUCCESS'
-        slack.sendToSlack(currentResult, slack_channel, String.format("New Image: %s:%s", docker_repository, tag), msg_title)
+        // slack.sendToSlack(currentResult, slack_channel, String.format("%s:%s", docker_repository, tag), msg_title)
     }
-
 }
 
 return this
