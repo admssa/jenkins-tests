@@ -14,7 +14,7 @@ def generatePlainReport(image, engine_url){
     def reg = ~/^docker-host:65534\// 
     def img = image - reg
     report.put("status", status.trim())
-    report.put("image", img))
+    report.put("image", img)
 
     for (type in vuln_types){
         def vulns_by_type = new JSONObject()
