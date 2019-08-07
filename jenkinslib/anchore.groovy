@@ -6,7 +6,7 @@ def generatePlainReport(image){
     def vuln_types     = ["os", "non-os"]
     def vuln_levels    = ["Low", "Medium", "High", "Negligible"]
     //require IMAGE, VULN_TYPE, VULN_LEVEL
-    def report         = """anchore-cli image vuln %s %s | grep %s | awk '{print \$2}' | sort | uniq | wc -l"""
+    def get_vulns      = """anchore-cli image vuln %s %s | grep %s | awk '{print \$2}' | sort | uniq | wc -l"""
     def get_status_cmd = String.format("""anchore-cli evaluate check %s | grep Status | awk '{print \$2}'""",image)
     JSONObject report  = new JSONObject()
 
