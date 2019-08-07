@@ -32,7 +32,7 @@ def runBuild(repo_dir){
             anchore bailOnFail: false, autoSubscribeTagUpdates: false, engineCredentialsId: 'anchore_admin', engineurl: 'http://docker-host:8228/v1', engineRetries: anchore_timeout, forceAnalyze: true, name: 'anchore_images'
             echo "Preparing reports before getting status of the check"
             short_report = anchore_script.generatePlainReport(iamge_name)               
-            if (short_report != null and short_report.status == 'fail'){
+            if (short_report != null && short_report.status == 'fail'){
                 return
             }
 
