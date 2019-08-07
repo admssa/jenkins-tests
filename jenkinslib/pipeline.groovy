@@ -6,7 +6,7 @@ def runBuild(repo_dir){
   def docker_repository = "admssa/diag"
   def local_registry    = "docker-host:65534"
   def tag               = env.TAG_NAME
-  def msg_title         = "Datalabs images build"
+  def msg_title         = "*<${env.BUILD_URL}|${env.JOB_NAME}>*"
   def slack_channel     = "#jenkins-automation"    
   def slack             = load "jenkinslib/slack.groovy"
   def io_operations     = load "jenkinslib/io_operations.groovy"  
@@ -37,6 +37,7 @@ def runBuild(repo_dir){
             }
             println short_report         
             if (short_report == null || short_report.status != 'pass'){
+                short_report.put("image", "${docker_repository}:${tag}"))
                 currentBuild.result = 'FAILURE'
                 error("Anchore: Image didn't pass the check")
             }

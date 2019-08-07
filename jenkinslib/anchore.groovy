@@ -11,9 +11,6 @@ def generatePlainReport(image, engine_url){
     JSONObject report  = new JSONObject()
 
     def status = sh script: get_status_cmd, returnStdout: true
-    
-    report.put("image", image.trim())
-    report.put("status", status.trim())
 
     for (type in vuln_types){
         def vulns_by_type = new JSONObject()
@@ -24,7 +21,7 @@ def generatePlainReport(image, engine_url){
         }
         report.put(type,vulns_by_type)
     }
-
+    report.put("status", status.trim())
     
     return report
     
