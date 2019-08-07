@@ -19,11 +19,12 @@ def getRequest(url){
         http_client.setConnectTimeout(10)
         http_client.connect()
         resp_code = http_client.getResponseCode()
+        println resp_code
         if ( resp_code == '200' || resp_code == '202'){
             responce = http_client.getInputStream().getText()
         }
         else {
-            println String.format("Error %s while requesting %s\n%s", resp_code, url, http_client.getInputStream().getText())
+            println String.format("Error %s while requesting %s\n%s", resp_code, url, http_client.getErrorStream().toString())
         }
         }
     catch (Exception e) {
