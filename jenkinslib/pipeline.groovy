@@ -13,7 +13,7 @@ def runBuild(repo_dir){
         
   try {   
     def build_directory   = io_operations.getDir(tag, repo_dir)  
-    slack.sendToSlack('STARTED', slack_channel, "Starting job: ${env.JOB_NAME}", msg_title)
+    slack.sendToSlack('STARTED', slack_channel, "Starting the job", msg_title)
     if (build_directory != null) {
         stage('Build & push locally') {  
             img = docker.build("${docker_repository}:${tag}", "-f ./${build_directory}/Dockerfile ./${build_directory}")
@@ -35,7 +35,6 @@ def runBuild(repo_dir){
             withCredentials([usernamePassword(credentialsId: 'anchore_admin', usernameVariable: 'ANCHORE_CLI_USER', passwordVariable: 'ANCHORE_CLI_PASS')]) {
                 short_report = anchore_script.generatePlainReport(iamge_name, engine_url) 
             }
-            short_report.put("image", "${docker_repository}:${tag}")
             println short_report         
             if (short_report == null || short_report.status != 'pass'){
                 currentBuild.result = 'FAILURE'
@@ -72,7 +71,7 @@ def runBuild(repo_dir){
     finally {
         sh 'docker rmi -f $(docker images -f "dangling=true" -q)  || true'
         def currentResult = currentBuild.result ?: 'SUCCESS'
-        slack.sendToSlack(currentResult, slack_channel, "<${env.BUILD_URL}anchore-results/|Ancore full report>", msg_title, short_report)
+        slack.sendToSlack(currentResult, slack_channel, "For details see Ancore <${env.BUILD_URL}anchore-results/|report.>", msg_title, short_report)
     }
 }
 

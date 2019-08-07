@@ -11,6 +11,10 @@ def generatePlainReport(image, engine_url){
     JSONObject report  = new JSONObject()
 
     def status = sh script: get_status_cmd, returnStdout: true
+    def reg = ~/^docker-host:65534\// 
+    def img = image - reg
+    report.put("status", status.trim())
+    report.put("image", img))
 
     for (type in vuln_types){
         def vulns_by_type = new JSONObject()
@@ -21,7 +25,7 @@ def generatePlainReport(image, engine_url){
         }
         report.put(type,vulns_by_type)
     }
-    report.put("status", status.trim())
+    
     
     return report
     
