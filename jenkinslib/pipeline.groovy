@@ -35,8 +35,10 @@ def runBuild(repo_dir){
             withCredentials([usernamePassword(credentialsId: 'anchore_admin', usernameVariable: 'ANCHORE_CLI_USER', passwordVariable: 'ANCHORE_CLI_PASS')]) {
                 short_report = anchore_script.generatePlainReport(iamge_name, engine_url) 
             }
-            println short_report              
-            if (short_report != null && short_report.status == 'fail'){
+            println short_report  
+            println short_report.status            
+            if (short_report == null || short_report['status'] != 'pass'){
+                println "Inside the if"
                 return
             }
 
