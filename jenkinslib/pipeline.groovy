@@ -16,7 +16,7 @@ def runBuild(repo_dir){
     if (build_directory != null) {
         stage('Build & push locally') {  
             def options = "-f ./${build_directory}/Dockerfile ./${build_directory}"
-            if ("tag0-" in build_directory) {
+            if (build_directory.contains("tag0-")) {
                 options = options + " --target ${build_directory}"
             }
             img = docker.build("${docker_repository}:${tag}", options)
@@ -29,7 +29,7 @@ def runBuild(repo_dir){
             def iamge_name      = "${local_registry}/${docker_repository}:${tag}"
             def engine_url      = "http://docker-host:8228/v1"
             def anchore_timeout = '3600'
-            if ('jupyter-' in tag) {
+            if (tag.contains('jupyter-')) {
                 anchore_timeout = '10800'
             }
             writeFile file: 'anchore_images', text: iamge_name

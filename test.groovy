@@ -26,3 +26,10 @@ def say(msg='Hello',name='world') {
    println "$msg $name!"
 }
 say("test")
+
+if ("jopa".contains("a")) {
+   print 'true' 
+}
+else {
+   print 'false'
+}
