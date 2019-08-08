@@ -1,19 +1,18 @@
 def runBuild(repo_dir){
   
   def img               = null
-  def fields_list       = null
   def short_report      = null
   def docker_repository = "admssa/diag"
   def local_registry    = "docker-host:65534"
   def tag               = env.TAG_NAME
-  def msg_title         = "Datalabs images build"
+  def msg_title         = "<${env.BUILD_URL}|${env.JOB_NAME}>"
   def slack_channel     = "#jenkins-automation"    
   def slack             = load "jenkinslib/slack.groovy"
   def io_operations     = load "jenkinslib/io_operations.groovy"  
         
   try {   
     def build_directory   = io_operations.getDir(tag, repo_dir)  
-    // slack.sendToSlack('STARTED', slack_channel, "Starting build job: ${env.JOB_NAME}", msg_title)
+    slack.sendToSlack('STARTED', slack_channel, "Starting the job", msg_title)
     if (build_directory != null) {
         stage('Build & push locally') {  
             img = docker.build("${docker_repository}:${tag}", "-f ./${build_directory}/Dockerfile ./${build_directory}")
@@ -66,12 +65,12 @@ def runBuild(repo_dir){
     catch (e) {
         echo "Pipeline failed: ${e}"
         currentBuild.result = 'FAILURE'
-        // slack.sendSlackError(slack_channel, "Exception ${e} while running build: ${env.BUILD_URL}console", msg_title)
+        slack.sendSlackError(slack_channel, "Exception ${e} while running build: ${env.BUILD_URL}console", msg_title)
     }
     finally {
         sh 'docker rmi -f $(docker images -f "dangling=true" -q)  || true'
         def currentResult = currentBuild.result ?: 'SUCCESS'
-        slack.sendToSlack(currentResult, slack_channel, String.format("%s:%s", docker_repository, tag), msg_title, short_report)
+        slack.sendToSlack(currentResult, slack_channel, "For details see Anchore <${env.BUILD_URL}anchore-results/|report> or full job <${env.BUILD_URL}console|output.>", msg_title, short_report)
     }
 }
 
