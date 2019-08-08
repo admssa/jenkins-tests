@@ -12,10 +12,14 @@ def runBuild(repo_dir){
         
   try {   
     def build_directory   = io_operations.getDir(tag, repo_dir)  
-    slack.sendToSlack('STARTED', slack_channel, "Starting the job", msg_title)
+    // slack.sendToSlack('STARTED', slack_channel, "Starting the job", msg_title)
     if (build_directory != null) {
         stage('Build & push locally') {  
-            img = docker.build("${docker_repository}:${tag}", "-f ./${build_directory}/Dockerfile ./${build_directory}")
+            def options = "-f ./${build_directory}/Dockerfile ./${build_directory}"
+            if ("jupyter-" in build_directory) {
+                options = options + " --target ${build_directory}"
+            }
+            img = docker.build("${docker_repository}:${tag}", options)
             docker.withRegistry("http://${local_registry}"){ 
               img.push()
             }
@@ -25,7 +29,7 @@ def runBuild(repo_dir){
             def iamge_name      = "${local_registry}/${docker_repository}:${tag}"
             def engine_url      = "http://docker-host:8228/v1"
             def anchore_timeout = '3600'
-            if ('jupyter' in tag) {
+            if ('jupyter-' in tag) {
                 anchore_timeout = '10800'
             }
             writeFile file: 'anchore_images', text: iamge_name
@@ -58,19 +62,18 @@ def runBuild(repo_dir){
             sh "docker rmi ${docker_repository}:${tag} || true"
             sh "docker rmi ${docker_repository}:${build_directory}-latest || true"
             sh "docker rmi ${local_registry}/${docker_repository}:${tag} || true"
-            sh "docker rmi ${local_registry}/${docker_repository}:${build_directory}-latest || true"
         }
     }
     }
     catch (e) {
         echo "Pipeline failed: ${e}"
         currentBuild.result = 'FAILURE'
-        slack.sendSlackError(slack_channel, "Exception ${e} while running build: ${env.BUILD_URL}console", msg_title)
+        // slack.sendSlackError(slack_channel, "Exception ${e} while running build: ${env.BUILD_URL}console", msg_title)
     }
     finally {
         sh 'docker rmi -f $(docker images -f "dangling=true" -q)  || true'
         def currentResult = currentBuild.result ?: 'SUCCESS'
-        slack.sendToSlack(currentResult, slack_channel, "For details see Anchore <${env.BUILD_URL}anchore-results/|report> or full job <${env.BUILD_URL}console|output.>", msg_title, short_report)
+        // slack.sendToSlack(currentResult, slack_channel, "For details see Anchore <${env.BUILD_URL}anchore-results/|report> or full job <${env.BUILD_URL}console|output.>", msg_title, short_report)
     }
 }
 
