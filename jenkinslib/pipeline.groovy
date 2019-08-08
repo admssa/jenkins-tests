@@ -70,7 +70,7 @@ def runBuild(repo_dir){
     finally {
         sh 'docker rmi -f $(docker images -f "dangling=true" -q)  || true'
         def currentResult = currentBuild.result ?: 'SUCCESS'
-        slack.sendToSlack(currentResult, slack_channel, "For details see Ancore <${env.BUILD_URL}anchore-results/|report> or full job <${env.BUILD_URL}console|output.>", msg_title, short_report)
+        slack.sendToSlack(currentResult, slack_channel, "For details see Anchore <${env.BUILD_URL}anchore-results/|report> or full job <${env.BUILD_URL}console|output.>", msg_title, short_report)
     }
 }
 
