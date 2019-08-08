@@ -16,7 +16,7 @@ def runBuild(repo_dir){
     if (build_directory != null) {
         stage('Build & push locally') {  
             def options = "-f ./${build_directory}/Dockerfile ./${build_directory}"
-            if ("jupyter-" in build_directory) {
+            if ("tag0-" in build_directory) {
                 options = options + " --target ${build_directory}"
             }
             img = docker.build("${docker_repository}:${tag}", options)
