@@ -12,7 +12,7 @@ def sendSlackString(slack_channel, msg, title, color, short_report){
     JSONArray attachments = new JSONArray()
     attachments.add(attachment);
     if (short_report != null ){
-        attachments.add(jsonToAttachment(short_report))
+        attachments.add(jsonToAttachment(short_report, color))
     }
         
     slackSend color: color,
