@@ -14,7 +14,7 @@ def generatePlainReport(image, engine_url){
     def status = sh script: cmd_get_status, returnStdout: true
     def reg = ~/^docker-host:65534\// 
     def img = image - reg
-    report.put("status", status.trim())
+    report.put("anchore-status", status.trim())
     report.put("image", img)
 
     for (type in vuln_types){

@@ -24,7 +24,7 @@ def jsonToAttachment(short_report, color){
     def msg = new String() 
 
     for (object in short_report){
-        if (object.value != null && object.value.size() != 0) {
+        if (object.value != null) {
             if (object.value instanceof net.sf.json.JSONObject){
                 object.value = object.value.toString().replaceAll("[^a-zA-Z0-9():]+", " ")
             }
