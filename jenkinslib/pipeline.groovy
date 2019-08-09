@@ -75,7 +75,7 @@ def runBuild(repo_dir){
     finally {
         sh 'docker rmi -f $(docker images -f "dangling=true" -q)  || true'
         def currentResult = currentBuild.result ?: 'SUCCESS'
-        def message = "For details see job full <${env.BUILD_URL}console|output.>"
+        def message = "For details see Anchore <${env.BUILD_URL}anchore-results/|report> or full job <${env.BUILD_URL}console|output.>"
         if (img == null) {
             message = "Nothing to do, see job full <${env.BUILD_URL}console|output.>"
         }
