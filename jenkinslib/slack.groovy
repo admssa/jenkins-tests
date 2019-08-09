@@ -24,9 +24,8 @@ def jsonToAttachment(short_report, color){
     def msg = new String() 
 
     for (object in short_report){
-        println object.value.getClass()
-        if (object.value instanceof java.util.HashMap && object.value.size() > 0){
-            object.value = object.value.toString().replaceAll("[^a-zA-Z0-9()]+", " ")
+        if (object.value instanceof net.sf.json.JSONObject && object.value.size() > 0){
+            object.value = object.value.toString().replaceAll("[^a-zA-Z0-9():]+", " ")
         }
         msg = msg + "\n*" + object.key.toString() + ":* _" + object.value.toString() + "_"
     }
