@@ -33,7 +33,7 @@ def jsonToAttachment(short_report, color){
     attachment.put('text', msg.toString())
     attachment.put('title', 'Anchore check.')
     attachment.put('color', color)
-    )
+    
     return attachment
 }
 
