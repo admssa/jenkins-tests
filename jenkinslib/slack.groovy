@@ -9,7 +9,13 @@ def sendSlackString(slack_channel, msg, title, color, short_report){
           if (object.value instanceof java.util.HashMap && object.value.size() > 0){
                object.value = object.value.toString().replace("[", "").replace("]", "")
             }
+            if (object.first()) {
+                msg = msg + "```"
+            }
             msg = msg + "\n*" + object.key.toString() + ":* " + object.value.toString()
+            if (object.last()){
+                msg = msg + "```"
+            }
         }
     }
     JSONObject attachment = new JSONObject()
@@ -20,16 +26,6 @@ def sendSlackString(slack_channel, msg, title, color, short_report){
     attachments.add(attachment);
 
         
-        // for (object in short_report){
-        //     if (object.value instanceof java.util.HashMap && object.value.size() > 0){
-        //         object.value = object.value.toString().replace("[", "").replace("]", "")
-        //     }
-        //     JSONObject anchore_report = new JSONObject()            
-        //     anchore_report.put('title', object.key.toString())
-        //     anchore_report.put('color', color.toString())
-        //     anchore_report.put('text', object.value.toString())
-        //     attachments.add(anchore_report)
-        // }
     slackSend color: color,
     channel: slack_channel,
     attachments: attachments.toString()
