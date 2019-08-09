@@ -9,11 +9,11 @@ def sendSlackString(slack_channel, msg, title, color, short_report){
           if (object.value instanceof java.util.HashMap && object.value.size() > 0){
                object.value = object.value.toString().replace("[", "").replace("]", "")
             }
-            if (object.first()) {
+            if (object == short_report.first()) {
                 msg = msg + "```"
             }
             msg = msg + "\n*" + object.key.toString() + ":* " + object.value.toString()
-            if (object.last()){
+            if (object ==  short_report.last()){
                 msg = msg + "```"
             }
         }
