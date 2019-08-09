@@ -42,7 +42,7 @@ def runBuild(repo_dir){
                 short_report = anchore_script.generatePlainReport(iamge_name, engine_url) 
             }
             println short_report         
-            if (short_report == null || short_report.status != 'pass'){
+            if (short_report == null || short_report.anchore_check != 'pass'){
                 currentBuild.result = 'UNSTABLE'
             }
         }
