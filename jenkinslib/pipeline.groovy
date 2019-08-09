@@ -76,7 +76,7 @@ def runBuild(repo_dir){
         sh 'docker rmi -f $(docker images -f "dangling=true" -q)  || true'
         def currentResult = currentBuild.result ?: 'SUCCESS'
         def message = "For details see job full <${env.BUILD_URL}console|output.>"
-        if (build_directory == null) {
+        if (img == null) {
             message = "Nothing to do, see job full <${env.BUILD_URL}console|output.>"
         }
         slack.sendToSlack(currentResult, slack_channel, message, msg_title, short_report)
