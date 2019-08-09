@@ -4,31 +4,37 @@ import net.sf.json.JSONObject;
 import groovy.json.JsonSlurperClassic;
 
 def sendSlackString(slack_channel, msg, title, color, short_report){
-    if (short_report != null ){
 
-      for (object in short_report){
-          if (object.value instanceof java.util.HashMap && object.value.size() > 0){
-               object.value = object.value.toString().replace("[", "").replace("]", "")
-            }
-            msg = msg + "\n*" + object.key.toString() + ":* _" + object.value.toString() + "_"
-        }
- 
-    }
     JSONObject attachment = new JSONObject()
     attachment.put('text', msg.toString())
     attachment.put('title', title.toString())
     attachment.put('color', color.toString())
     JSONArray attachments = new JSONArray()
     attachments.add(attachment);
-
+    if (short_report != null ){
+        attachments.add(jsonToAttachment(short_report))
+    }
         
     slackSend color: color,
     channel: slack_channel,
     attachments: attachments.toString()
 }
 
-def jsonToStringMsg(){
+def jsonToAttachment(short_report, color){
+    def msg = new String() 
 
+    for (object in short_report){
+        if (object.value instanceof java.util.HashMap && object.value.size() > 0){
+            object.value = object.value.toString().replace("[", "").replace("]", "")
+        }
+        msg = msg + "\n*" + object.key.toString() + ":* _" + object.value.toString() + "_"
+    }
+    JSONObject attachment = new JSONObject()
+    attachment.put('text', msg.toString())
+    attachment.put('title', 'Anchore check.')
+    attachment.put('color', color)
+    )
+    return attachment
 }
 
 def sendSlackNotification(slack_channel, msg, title, color, report) {
