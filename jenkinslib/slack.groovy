@@ -24,10 +24,13 @@ def jsonToAttachment(short_report, color){
     def msg = new String() 
 
     for (object in short_report){
-        if (object.value instanceof net.sf.json.JSONObject && object.value.size() > 0){
-            object.value = object.value.toString().replaceAll("[^a-zA-Z0-9():]+", " ")
+        if (object.value != null || object.value != "") {
+            println object.value
+            if (object.value instanceof net.sf.json.JSONObject && object.value.size() > 0){
+                object.value = object.value.toString().replaceAll("[^a-zA-Z0-9():]+", " ")
+            }
+            msg = msg + "\n*" + object.key.toString() + ":* _" + object.value.toString() + "_"
         }
-        msg = msg + "\n*" + object.key.toString() + ":* _" + object.value.toString() + "_"
     }
     JSONObject attachment = new JSONObject()
     attachment.put('text', msg.toString())
