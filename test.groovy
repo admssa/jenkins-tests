@@ -4,7 +4,7 @@ import groovy.json.JsonSlurperClassic;
 
 
 
-def jsonString = '{"status":"pass","os":{"Low":"0(0)","Medium":"0(0)","High":"2(1)","Negligible":"0(0)"},"non-os":{"Low":"0","Medium":"0","High":"0","Negligible":"0"}}'
+def jsonString = '{"status":"fail","image":"admssa/diag:tag0-001.2","os":{"Negligible":"0(0)","Unknown":"0(0)","Low":"6(6)","Medium":"18(18)","High":"0(0)"},"non-os":{"Negligible":"0(0)","Unknown":"0(0)","Low":"0(0)","Medium":"4(0)","High":"2(0)"}}'
 
 def json = new JsonSlurperClassic().parseText(jsonString)
 
@@ -12,8 +12,8 @@ def formated_message = new String()
 for (object in json){
    // println object.value.getClass()
    if (object.value instanceof java.util.HashMap && object.value.size() > 0){
-       object.value = object.value.toString().replace("[", "").replace("]", "")
-      //  println object.value
+       object.value = object.value.toString().replaceAll("[^a-zA-Z0-9():]+", " ")
+       print object.value
    }
     formated_message = formated_message + "\n*" + object.key.toString() + "*\n" + object.value.toString()
 }
