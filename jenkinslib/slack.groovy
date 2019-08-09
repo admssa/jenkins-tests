@@ -4,27 +4,39 @@ import net.sf.json.JSONObject;
 import groovy.json.JsonSlurperClassic;
 
 def sendSlackString(slack_channel, msg, title, color, short_report){
+    if (short_report != null ){
+      for (object in short_report){
+          if (object.value instanceof java.util.HashMap && object.value.size() > 0){
+               object.value = object.value.toString().replace("[", "").replace("]", "")
+            }
+            msg = msg + "\n*" + object.key.toString() + "*\n" + object.value.toString()
+        }
+    }
     JSONObject attachment = new JSONObject()
     attachment.put('text', msg.toString())
     attachment.put('title', title.toString())
     attachment.put('color', color.toString())
     JSONArray attachments = new JSONArray()
     attachments.add(attachment);
-    if (short_report != null && short_report.size() > 0) {
-        for (object in short_report){
-            if (object.value instanceof java.util.HashMap && object.value.size() > 0){
-                object.value = object.value.toString().replace("[", "").replace("]", "")
-            }
-            JSONObject anchore_report = new JSONObject()            
-            anchore_report.put('title', object.key.toString())
-            anchore_report.put('color', color.toString())
-            anchore_report.put('text', object.value.toString())
-            attachments.add(anchore_report)
-        }
-    }
+
+        
+        // for (object in short_report){
+        //     if (object.value instanceof java.util.HashMap && object.value.size() > 0){
+        //         object.value = object.value.toString().replace("[", "").replace("]", "")
+        //     }
+        //     JSONObject anchore_report = new JSONObject()            
+        //     anchore_report.put('title', object.key.toString())
+        //     anchore_report.put('color', color.toString())
+        //     anchore_report.put('text', object.value.toString())
+        //     attachments.add(anchore_report)
+        // }
     slackSend color: color,
     channel: slack_channel,
     attachments: attachments.toString()
+}
+
+def jsonToStringMsg(){
+
 }
 
 def sendSlackNotification(slack_channel, msg, title, color, report) {
