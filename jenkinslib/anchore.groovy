@@ -24,7 +24,7 @@ def generatePlainReport(image, engine_url){
             def cmd_fixes = String.format(get_fixes, image, type, level)
             def number = sh script: cmd_vulns, returnStdout: true
             def fixes = sh script: cmd_fixes, returnStdout: true
-            if (number != '0'){
+            if (number != 0){
                 vulns_by_type.put(level, number.trim() + "(" + fixes.trim() + ")")
             }
         }
