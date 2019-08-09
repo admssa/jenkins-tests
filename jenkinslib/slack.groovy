@@ -9,7 +9,7 @@ def sendSlackString(slack_channel, msg, title, color, short_report){
           if (object.value instanceof java.util.HashMap && object.value.size() > 0){
                object.value = object.value.toString().replace("[", "").replace("]", "")
             }
-            msg = msg + "\n*" + object.key.toString() + "*\n" + object.value.toString()
+            msg = msg + "\n*" + object.key.toString() + ": " + object.value.toString()
         }
     }
     JSONObject attachment = new JSONObject()
