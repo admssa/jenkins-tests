@@ -19,7 +19,7 @@ def sendSlackString(slack_channel, msg, title, color, short_report){
             anchore_report.put('title', object.key.toString())
             anchore_report.put('color', color.toString())
             anchore_report.put(object.value)
-            attachments.put(anchore_report)
+            attachments.add(anchore_report)
         }
     }
     slackSend color: color,
