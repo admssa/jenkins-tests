@@ -31,7 +31,7 @@ def jsonToAttachment(short_report, color){
     }
     JSONObject attachment = new JSONObject()
     attachment.put('text', msg.toString())
-    attachment.put('title', 'Anchore check.')
+    attachment.put('title', '<${env.BUILD_URL}anchore-results/|Anchore report>')
     attachment.put('color', color)
     
     return attachment
