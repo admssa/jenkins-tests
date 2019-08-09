@@ -5,14 +5,14 @@ import groovy.json.JsonSlurperClassic;
 
 def sendSlackString(slack_channel, msg, title, color, short_report){
     if (short_report != null ){
-      msg = msg + "```"  
+
       for (object in short_report){
           if (object.value instanceof java.util.HashMap && object.value.size() > 0){
                object.value = object.value.toString().replace("[", "").replace("]", "")
             }
-            msg = msg + "\n" + object.key.toString() + ": " + object.value.toString()
+            msg = msg + "\n*" + object.key.toString() + ":* _" + object.value.toString() + "_"
         }
-      msg = msg + "```"  
+ 
     }
     JSONObject attachment = new JSONObject()
     attachment.put('text', msg.toString())
