@@ -16,7 +16,7 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
         skip_push  = tag_msg.contains('nopush')   
     }
     try {
-        //slack.sendToSlack('STARTED', slack_channel, "Starting the job", msg_title)
+        slack.sendToSlack('STARTED', slack_channel, "Starting the job", msg_title)
         stage('Build images') {
             for (image in multibuild_opts) {
                 images.add(docker.build(image.name, image.options))
@@ -92,13 +92,13 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
     catch (e) {
         echo "Pipeline failed: ${e}"
         currentBuild.result = 'FAILURE'
-        //slack.sendSlackError(slack_channel, "Exception ${e} while running build: ${env.BUILD_URL}console", msg_title, null)    
+        slack.sendSlackError(slack_channel, "Exception ${e} while running build: ${env.BUILD_URL}console", msg_title, null)    
     }    
     finally {
         sh 'docker rmi $(docker images -f "dangling=true" -q)  || true'
         def currentResult = currentBuild.result ?: 'SUCCESS'
         def message = "For details see Anchore <${env.BUILD_URL}anchore-results/|report> or full job <${env.BUILD_URL}console|output.>"        
-        //slack.sendToSlack(currentResult, slack_channel, message, msg_title, reports)
+        slack.sendToSlack(currentResult, slack_channel, message, msg_title, reports)
     }
 }
 
