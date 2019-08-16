@@ -1,16 +1,22 @@
 #!groovy
 
-import groovy.json.JsonSlurperClassic;
 
-import net.sf.json.JSONObject;
 
-JSONObject test = new JSONObject()
-if (test.length() != 0){
-   print true
-}
-else {
-   print false
-}
+def arl = ['lolo', 'test']
+def str = ''
+for (i in arl){
+   str = str.concat(i.concat("\n"))
+} 
+
+println str.trim()
+
+// JSONObject test = new JSONObject()
+// if (test.length() != 0){
+//    print true
+// }
+// else {
+//    print false
+// }
 
 // def jsonString = '{"status":"fail","image":"admssa/diag:tag0-001.2","os":{"Negligible":"0(0)","Unknown":"0(0)","Low":"6(6)","Medium":"18(18)","High":"0(0)"},"non-os":{"Negligible":"0(0)","Unknown":"0(0)","Low":"0(0)","Medium":"4(0)","High":"2(0)"}}'
 
