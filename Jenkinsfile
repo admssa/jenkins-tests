@@ -7,10 +7,10 @@ node {
     def code_version      = sh(script: "cat ./CODE_VERSION", returnStdout: true)?.trim()
 
 
-    if (env.TAG_NAME.consist('tag0')) {
+    if (env.TAG_NAME.contains('tag0')) {
         multibuild_opts = [
             [name: "${docker_registry}:${env.TAG_NAME}",
-             options: "-f tag0/Doclerfile ./tag1/." ],
+             options: "-f tag0/Doclerfile tag0/." ],
             [name: "${docker_registry}:${env.TAG_NAME}-missed",
              options: "-f tag0-missed/Dockerfile tag0-midded/." ],
             [name: "${docker_registry}:${env.TAG_NAME}-test",
@@ -18,7 +18,7 @@ node {
         ] 
 
     }
-    else if(env.TAG_NAME.consist('tag1')) {
+    else if(env.TAG_NAME.contains('tag1')) {
         multibuild_opts = [ 
             [name: "${docker_registry}:${env.TAG_NAME}",
              options: "-f tag1/Doclerfile ./tag1/." ] ]
