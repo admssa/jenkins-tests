@@ -2,7 +2,8 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
     def tag               = env.TAG_NAME
     def local_registry    = "docker-host:65534"
     def msg_title         = "<${env.BUILD_URL}|${env.JOB_NAME}>"
-    def slack_channel     = "#jenkins-automation"    
+    def slack_channel     = "#jenkins-automation"
+    def engine_url        = "http://docker-host:8228/v1"    
     def slack             = load "jenkinslib/slack.groovy"
     def images            = []
     def reports           = []        
@@ -30,7 +31,6 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
                 }                
             } 
             stage('Scan for vulnerabilities') {  
-                def engine_url      = "http://docker-host:8228/v1"
                 def anchore_timeout = '7200'
                 def string_images   = ''     
                 for (img in images){
@@ -53,7 +53,7 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
                                                   passwordVariable: 'ANCHORE_CLI_PASS')]) {
                     for (img in images){
                         def image_name = String.format("%s/%s", local_registry, img.imageName())
-                        def short_report = anchore_script.generatePlainReport(iamge_name, engine_url)
+                        def short_report = anchore_script.generatePlainReport(image_name, engine_url)
                         reports.add(short_report)
                         if (short_report == null || short_report.anchore_check != 'pass'){
                             currentBuild.result = 'UNSTABLE'
