@@ -65,7 +65,7 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
                 def registry = load "jenkinslib/registry.groovy"
                 for (img in images) {
                     def splited_name = img.imageName().split(':')
-                    def mg_removed = registry.deleteByTag(local_registry, splited_name[0], splited_name[1])
+                    def img_removed = registry.deleteByTag(local_registry, splited_name[0], splited_name[1])
                     if (!img_removed){
                         currentBuild.result = 'UNSTABLE'
                     }
