@@ -21,9 +21,9 @@ node {
     else if(env.TAG_NAME.contains('tag1')) {
         multibuild_opts = [ 
             [name: "${docker_registry}:${env.TAG_NAME}",
-             options: "-f tag1/Doclerfile ./tag1/." ] ]
+             options: "-f tag1/Doclerfile tag1/." ] ]
     }
-    if (multibuild_opts > 0){
+    if (multibuild_opts.size() > 0){
         pipeline.runBuild(pwd(), docker_registry, multibuild_opts, dockerhub_creds)  
     }
     else {
