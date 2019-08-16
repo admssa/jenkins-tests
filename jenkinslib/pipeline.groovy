@@ -4,7 +4,7 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
     def msg_title         = "<${env.BUILD_URL}|${env.JOB_NAME}>"
     def slack_channel     = "#jenkins-automation"    
     def slack             = load "jenkinslib/slack.groovy"
-    def iamges            = []
+    def images            = []
     def reports           = []        
 
     def skip_check = false
