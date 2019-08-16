@@ -33,9 +33,9 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
                 def engine_url      = "http://docker-host:8228/v1"
                 def anchore_timeout = '7200'
                 def string_images   = ''     
-                for (img in images) {
+                for (img in images){
                     def image_name = String.format("%s/%s", local_registry, img.imageName())
-                    string_images = string_images.concat(image_name(image_name.concat('\n'))
+                    string_images = string_images.concat(image_name.concat('\n'))
                 }
                 writeFile file: 'anchore_images', text: string_images.trim()
                 anchore bailOnFail: false, 
