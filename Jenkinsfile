@@ -12,7 +12,7 @@ node {
             [name: "${docker_registry}:${env.TAG_NAME}",
              options: "-f tag0/Dockerfile tag0/." ],
             [name: "${docker_registry}:${env.TAG_NAME}-missed",
-             options: "-f tag0-missed/Dockerfile tag0-midded/." ],
+             options: "-f tag0-missed/Dockerfile tag0-missed/." ],
             [name: "${docker_registry}:${env.TAG_NAME}-test",
              options: "-f tag0-test/Dockerfile tag0-test/." ],
         ] 
