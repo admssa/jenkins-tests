@@ -3,7 +3,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import groovy.json.JsonSlurperClassic;
 
-def sendSlackString(slack_channel, msg, title, color, reports){
+def sendSlackString(slack_channel, msg, title, color, short_report){
 
     JSONObject attachment = new JSONObject()
     attachment.put('text', msg.toString())
@@ -11,10 +11,8 @@ def sendSlackString(slack_channel, msg, title, color, reports){
     attachment.put('color', color.toString())
     JSONArray attachments = new JSONArray()
     attachments.add(attachment);
-    if (reports != null && reports.size() > 0){
-        for report in reports {
-            attachments.add(jsonToAttachment(report, color))
-        }
+    if (short_report != null ){
+        attachments.add(jsonToAttachment(short_report, color))
     }
         
     slackSend color: color,
@@ -43,41 +41,41 @@ def jsonToAttachment(short_report, color){
     return attachment
 }
 
-def sendSlackNotification(slack_channel, msg, title, color, reports) {
-    sendSlackString(slack_channel, msg, title, color, reports)
+def sendSlackNotification(slack_channel, msg, title, color, report) {
+    sendSlackString(slack_channel, msg, title, color, report)
 }
 
-def sendSlackError(slack_channel, msg, title, reports) {
-    sendSlackNotification(slack_channel, msg, title, 'danger', reports)
+def sendSlackError(slack_channel, msg, title, report) {
+    sendSlackNotification(slack_channel, msg, title, 'danger', report)
 }
 
-def sendSlackWarning(slack_channel, msg, title, reports) {
-    sendSlackNotification(slack_channel, msg, title, 'warning', reports)
+def sendSlackWarning(slack_channel, msg, title, report) {
+    sendSlackNotification(slack_channel, msg, title, 'warning', report)
 }
 
-def sendSlackSuccess(slack_channel, msg, title, reports) {
-    sendSlackNotification(slack_channel, msg, title, 'good', fields, reports)
+def sendSlackSuccess(slack_channel, msg, title, fields) {
+    sendSlackNotification(slack_channel, msg, title, 'good', fields)
 }
 
-def sendSlackNetral(slack_channel, msg, title, reports) {
-    sendSlackNotification(slack_channel, msg, title, '#439FE0', report, reports)
+def sendSlackNetral(slack_channel, msg, title, report) {
+    sendSlackNotification(slack_channel, msg, title, '#439FE0', report)
 }
 
-def sendToSlack(buildResult, slack_channel, msg, title, reports=null){
+def sendToSlack(buildResult, slack_channel, msg, title, short_report=null){
     default_message = "Job was %s\n%s"
     def full_message = null
     if (buildResult == 'SUCCESS'){
         full_message = String.format(default_message, "finished successfully", msg)
-        sendSlackSuccess(slack_channel, full_message, title,  reports)
+        sendSlackSuccess(slack_channel, full_message, title,  short_report)
     } else if (buildResult == 'UNSTABLE'){
         full_message = String.format(default_message, "unstable", msg)
-        sendSlackWarning(slack_channel, full_message, title,  reports)
+        sendSlackWarning(slack_channel, full_message, title,  short_report)
     } else if (buildResult == 'FAILURE'){
         full_message = String.format(default_message, "failed", msg)
-        sendSlackError(slack_channel, full_message, title, reports)
+        sendSlackError(slack_channel, full_message, title, short_report)
     } 
     else{
-        sendSlackNetral(slack_channel, msg, title, reports)
+        sendSlackNetral(slack_channel, msg, title, short_report)
     }
 }
 

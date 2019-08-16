@@ -29,7 +29,11 @@ def generatePlainReport(image, engine_url){
             }
         }
         report.put(type,vulns_by_type)
-    }   
+    }
+    
+    
     return report
+    
 }
 return this
+

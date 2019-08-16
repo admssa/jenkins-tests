@@ -15,6 +15,7 @@ def deleteByTag(registry, repository, tag){
             else {
                 println(url)
                 println "Image hasn't removed ${http_client.responseCode}\nDebug: ${http_client}"
+
             }
         }
         catch (Exception e) {

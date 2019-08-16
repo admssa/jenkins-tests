@@ -1,98 +1,107 @@
-def runBuild(repo_dir){
-  
-  def img               = null
-  def short_report      = null
-  def docker_repository = "admssa/diag"
-  def dockerhub_creds   = "admssa_dockerhub"
-  def bad_dir           = "tag0-"
-  def local_registry    = "docker-host:65534"
-  
-  def tag               = env.TAG_NAME
-  def msg_title         = "<${env.BUILD_URL}|${env.JOB_NAME}>"
-  def slack_channel     = "#jenkins-automation"    
-  def slack             = load "jenkinslib/slack.groovy"
-  def io_operations     = load "jenkinslib/io_operations.groovy"  
-        
-  try {   
-    def build_directory   = io_operations.getDir(tag, repo_dir)  
-    // slack.sendToSlack('STARTED', slack_channel, "Starting the job", msg_title)
+def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
+    def tag               = env.TAG_NAME
+    def local_registry    = "docker-host:65534"
+    def msg_title         = "<${env.BUILD_URL}|${env.JOB_NAME}>"
+    def slack_channel     = "#jenkins-automation"    
+    def local_registry    = "docker-host:65534"
+    def slack             = load "jenkinslib/slack.groovy"
+    def iamges            = []
+    def reports           = []        
+
     def skip_check = false
-    def skip_push = false
-    def tag_msg = gitTagMessage(tag)
+    def skip_push  = false
+    def tag_msg    = gitTagMessage(tag)
     if (tag_msg != null) {
         skip_check = tag_msg.contains('nocheck')
-        skip_push  = tag_msg.contains('nopush')      
+        skip_push  = tag_msg.contains('nopush')   
     }
-
-    if (build_directory != null) {
-        stage('Build & push locally') {  
-            def options = "-f ./${build_directory}/Dockerfile ./${build_directory}"
-            if (build_directory.contains(bad_dir)) {
-                options = options + " --target ${build_directory}"
+    try {
+        //slack.sendToSlack('STARTED', slack_channel, "Starting the job", msg_title)
+        stage('Build images') {
+            for (image in multibuild_opts) {
+                images.add(docker.build(image.name, image.options))
             }
-            img = docker.build("${docker_repository}:${tag}", options)
-            docker.withRegistry("http://${local_registry}"){ 
-              img.push()
-            }
-        }
+        } 
         if (!skip_check){
-            stage('Scan for vulnerabilities') {
-                def anchore_script  = load "jenkinslib/anchore.groovy"
-                def iamge_name      = "${local_registry}/${docker_repository}:${tag}"
+            stage('Push to the local registry'){
+                docker.withRegistry("http://${local_registry}"){ 
+                    for (img in images) {
+                        img.push()
+                    }
+                }                
+            } 
+            stage('Scan for vulnerabilities') {  
                 def engine_url      = "http://docker-host:8228/v1"
-                def anchore_timeout = '3600'
-                if (tag.contains(bad_dir)) {
-                    anchore_timeout = '10800'
+                def anchore_timeout = '7200'
+                def string_images   = null     
+                for (img in images) {
+                    def image_name = String.format("%s/%s", local_registry, img.imageName())
+                    string_images = string_images + image_name + "\n"
                 }
-                writeFile file: 'anchore_images', text: iamge_name
-                anchore bailOnFail: false, autoSubscribeTagUpdates: false, engineCredentialsId: 'anchore_admin', engineurl: engine_url, engineRetries: anchore_timeout, forceAnalyze: true, name: 'anchore_images'
-                echo "Preparing reports before getting status of the check"
-                withCredentials([usernamePassword(credentialsId: 'anchore_admin', usernameVariable: 'ANCHORE_CLI_USER', passwordVariable: 'ANCHORE_CLI_PASS')]) {
-                    short_report = anchore_script.generatePlainReport(iamge_name, engine_url) 
-                }
-                println short_report         
-                if (short_report == null || short_report.anchore_check != 'pass'){
-                    currentBuild.result = 'UNSTABLE'
-                }
+                writeFile file: 'anchore_images', text: string_images
+                anchore bailOnFail: false, 
+                        autoSubscribeTagUpdates: false, 
+                        engineCredentialsId: 'anchore_admin', 
+                        engineurl: engine_url, 
+                        engineRetries: anchore_timeout, 
+                        forceAnalyze: true, 
+                        name: 'anchore_images'                
             }
+            stage('Prepare short reports'){
+                withCredentials([usernamePassword(credentialsId: 'anchore_admin', 
+                                                  usernameVariable: 'ANCHORE_CLI_USER', 
+                                                  passwordVariable: 'ANCHORE_CLI_PASS')]) {
+                    for (img in images){
+                        def image_name = String.format("%s/%s", local_registry, img.imageName())
+                        def short_report = anchore_script.generatePlainReport(iamge_name, engine_url)
+                        reports.add(short_report)
+                        if (short_report == null || short_report.anchore_check != 'pass'){
+                            currentBuild.result = 'UNSTABLE'
+                        }                          
+                    }                    
+                }      
+            }
+            stage('Removing from the local registry'){
+                def registry = load "jenkinslib/registry.groovy"
+                for (img in images) {
+                    def splited_name = img.imageName().split(':')
+                    def mg_removed = registry.deleteByTag(local_registry, splited_name[0], splited_name[1])
+                    if (!img_removed){
+                        currentBuild.result = 'UNSTABLE'
+                    }
+                }                            
+            }    
         }
         if (!skip_push){
-            stage('Push to the dockerhub'){ 
-                docker.withRegistry('', dockerhub_creds) { 
-                    img.push()
-                    img.push("${build_directory}-latest")
+            stage('Push to the dockerhub'){
+                docker.withRegistry('', dockerhub_creds) {            
+                    for (img in images) {
+                        img.push()
+                    }
                 }
+            }   
+        }
+        stage('Removing images'){
+            for (img in images){
+                def image_name = img.imageName()
+                sh "docker rmi ${image_name} || true"
+                sh "docker rmi ${local_registry}/${image_name} || true"
             }
-        }
-        stage('Removing from the local registry'){
-            println "Removing image manifest from the local registry"
-            def registry = load "jenkinslib/registry.groovy"
-            if( registry.deleteByTag(local_registry, docker_repository, tag) == false ){
-                currentBuild.result = 'UNSTABLE'
-            }
-        }
-        stage('Remove images') {
-            sh "docker rmi ${docker_repository}:${tag} || true"
-            sh "docker rmi ${docker_repository}:${build_directory}-latest || true"
-            sh "docker rmi ${local_registry}/${docker_repository}:${tag} || true"
-        }
-    }
+        }                           
     }
     catch (e) {
         echo "Pipeline failed: ${e}"
         currentBuild.result = 'FAILURE'
-        // slack.sendSlackError(slack_channel, "Exception ${e} while running build: ${env.BUILD_URL}console", msg_title, null)
-    }
+        //slack.sendSlackError(slack_channel, "Exception ${e} while running build: ${env.BUILD_URL}console", msg_title, null)    
+    }    
     finally {
-        sh 'docker rmi -f $(docker images -f "dangling=true" -q)  || true'
+        sh 'docker rmi $(docker images -f "dangling=true" -q)  || true'
         def currentResult = currentBuild.result ?: 'SUCCESS'
-        def message = "For details see Anchore <${env.BUILD_URL}anchore-results/|report> or full job <${env.BUILD_URL}console|output.>"
-        if (img == null) {
-            message = "Nothing to do, see job full <${env.BUILD_URL}console|output.>"
-        }
-        // slack.sendToSlack(currentResult, slack_channel, message, msg_title, short_report)
+        def message = "For details see Anchore <${env.BUILD_URL}anchore-results/|report> or full job <${env.BUILD_URL}console|output.>"        
+        //slack.sendToSlack(currentResult, slack_channel, message, msg_title, reports)
     }
 }
+
 
 def gitTagMessage(tag) {
     msg = sh(script: "git tag -n10000 -l ${tag}", returnStdout: true)?.trim()
@@ -101,6 +110,5 @@ def gitTagMessage(tag) {
     }
     return null
 }
-
 
 return this
