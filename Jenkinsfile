@@ -10,7 +10,7 @@ node {
     if (env.TAG_NAME.contains('tag0')) {
         multibuild_opts = [
             [name: "${docker_registry}:${env.TAG_NAME}",
-             options: "-f tag0/Doclerfile tag0/." ],
+             options: "-f tag0/Dockerfile tag0/." ],
             [name: "${docker_registry}:${env.TAG_NAME}-missed",
              options: "-f tag0-missed/Dockerfile tag0-midded/." ],
             [name: "${docker_registry}:${env.TAG_NAME}-test",
@@ -21,7 +21,7 @@ node {
     else if(env.TAG_NAME.contains('tag1')) {
         multibuild_opts = [ 
             [name: "${docker_registry}:${env.TAG_NAME}",
-             options: "-f tag1/Doclerfile tag1/." ] ]
+             options: "-f tag1/Dockerfile tag1/." ] ]
     }
     if (multibuild_opts.size() > 0){
         pipeline.runBuild(pwd(), docker_registry, multibuild_opts, dockerhub_creds)  
