@@ -4,7 +4,7 @@ node {
     def docker_registry   = "admssa/diag"
     def dockerhub_creds   = "admssa_dockerhub"
     def multibuild_opts   = []
-    def code_version      = sh(script: "cat ${repo_dir}/CODE_VERSION", returnStdout: true)?.trim()
+    def code_version      = sh(script: "cat ./CODE_VERSION", returnStdout: true)?.trim()
 
 
     if (env.TAG_NAME.consist('tag0')) {
