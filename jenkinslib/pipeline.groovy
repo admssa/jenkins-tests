@@ -47,6 +47,7 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
                         name: 'anchore_images'                
             }
             stage('Prepare short reports'){
+                def anchore_script  = load "jenkinslib/anchore.groovy"
                 withCredentials([usernamePassword(credentialsId: 'anchore_admin', 
                                                   usernameVariable: 'ANCHORE_CLI_USER', 
                                                   passwordVariable: 'ANCHORE_CLI_PASS')]) {
