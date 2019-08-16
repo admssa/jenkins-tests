@@ -56,11 +56,11 @@ def sendSlackWarning(slack_channel, msg, title, reports) {
 }
 
 def sendSlackSuccess(slack_channel, msg, title, reports) {
-    sendSlackNotification(slack_channel, msg, title, 'good', fields, reports)
+    sendSlackNotification(slack_channel, msg, title, 'good', reports)
 }
 
 def sendSlackNetral(slack_channel, msg, title, reports) {
-    sendSlackNotification(slack_channel, msg, title, '#439FE0', report, reports)
+    sendSlackNotification(slack_channel, msg, title, '#439FE0', reports)
 }
 
 def sendToSlack(buildResult, slack_channel, msg, title, reports=null){
