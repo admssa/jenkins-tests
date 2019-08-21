@@ -4,7 +4,7 @@ import net.sf.json.JSONObject;
 def generatePlainReport(image, engine_url){
 
     def vuln_types     = ["os", "non-os"]
-    def vuln_levels    = ["Unknown", "Negligible", "Low", "Medium", "High" ]
+    def vuln_levels    = ["Unknown", "Negligible", "Low", "Medium", "High", "Critical" ]
     //require IMAGE, VULN_TYPE, VULN_LEVEL
     def get_vulns      = """anchore-cli --url ${engine_url} image vuln %s %s | grep %s | awk '{print \$2}' | sort | uniq | wc -l"""
     def get_fixes      = """anchore-cli --url ${engine_url} image vuln %s %s | grep -v None | grep %s | awk '{print \$2}' | sort | uniq | wc -l"""

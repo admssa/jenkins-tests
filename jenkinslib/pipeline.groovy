@@ -2,7 +2,7 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
     def tag               = env.TAG_NAME
     def local_registry    = "docker-host:65534"
     def msg_title         = "<${env.BUILD_URL}|${env.JOB_NAME}>"
-    def slack_channel     = "#jenkins-automation"
+    def slack_channel     = "#automation_hooks"
     def engine_url        = "http://docker-host:8228/v1"    
     def slack             = load "jenkinslib/slack.groovy"
     def images            = []
@@ -19,7 +19,9 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
         slack.sendToSlack('STARTED', slack_channel, "Starting the job", msg_title)
         stage('Build images') {
             for (image in multibuild_opts) {
-                images.add(docker.build(image.name, image.options))
+                docker.withRegistry('', dockerhub_creds) { 
+                    images.add(docker.build(image.name, image.options))
+                }
             }
         } 
         if (!skip_check){
@@ -57,6 +59,14 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
                         reports.add(short_report)
                         if (short_report == null || short_report.anchore_check != 'pass'){
                             currentBuild.result = 'UNSTABLE'
+                        }
+                        if (short_report != null){
+                            for (object in short_report){
+                                if(object.value != null && object.value.contains("Critical")){
+                                    currentBuild.result = 'FAILURE'
+                                    error("Image didn't pass vulnerability check")
+                                }
+                            }
                         }                          
                     }                    
                 }      
