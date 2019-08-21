@@ -62,7 +62,7 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
                         }
                         if (short_report != null){
                             for (object in short_report){
-                                if(object.value != null && object.value.contains("Critical")){
+                                if(object.value != null && object.value.toString().contains("Critical")){
                                     currentBuild.result = 'FAILURE'
                                     error("Image didn't pass vulnerability check")
                                 }
