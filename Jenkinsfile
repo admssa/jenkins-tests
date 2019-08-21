@@ -26,7 +26,7 @@ node {
     else if(env.TAG_NAME.contains('tag-elastic')){
         multibuild_opts = [ 
             [name: "${docker_registry}:${env.TAG_NAME}",
-             options: "-f tag1/Dockerfile tag-elastic/." ] ]
+             options: "-f tag-elastic/Dockerfile tag-elastic/." ] ]
     }
     if (multibuild_opts.size() > 0){
         pipeline.runBuild(pwd(), docker_registry, multibuild_opts, dockerhub_creds)  
