@@ -31,9 +31,12 @@ def jsonToAttachment(short_report, color){
                 if (object.value.size() == 0){
                     object.value = "None"
                 }
-                object.value = object.value.toString().replaceAll("[^a-zA-Z0-9():]+", " ")
+                def line = new String()
+                for (vuln in object.value){
+                    line = line + vuln.key +": " + vuln.value + "  "
+                }  
             }
-            msg = msg + "\n*" + object.key.toString().trim() + ":* _" + object.value.toString() + "_ "
+            msg = msg + "\n*" + object.key.toString() + ":* _" + line + "_"
         }
     }
     JSONObject attachment = new JSONObject()
