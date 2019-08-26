@@ -2,34 +2,88 @@
 import net.sf.json.JSONObject;
 
 def generatePlainReport(image, engine_url){
-
-    def vuln_types     = ["os", "non-os"]
-    def vuln_levels    = ["Unknown", "Negligible", "Low", "Medium", "High", "Critical" ]
-    //require IMAGE, VULN_TYPE, VULN_LEVEL
-    def get_vulns      = """anchore-cli --url ${engine_url} image vuln %s %s | grep %s | awk '{print \$2}' | sort | uniq | wc -l"""
-    def get_fixes      = """anchore-cli --url ${engine_url} image vuln %s %s | grep -v None | grep %s | awk '{print \$2}' | sort | uniq | wc -l"""
-    def cmd_get_status = String.format("""anchore-cli  --url ${engine_url} evaluate check %s | grep Status | awk '{print \$2}'""", image)
-    JSONObject report  = new JSONObject()
-
-    def status = sh script: cmd_get_status, returnStdout: true
-    def reg = ~/^docker-host:65534\// 
-    def img = image - reg
-    report.put("anchore_check", status.trim())
-    report.put("image", img)
-
-    for (type in vuln_types){
-        def vulns_by_type = new JSONObject()
-        for (level in vuln_levels){
-            def cmd_vulns = String.format(get_vulns, image, type, level)
-            def cmd_fixes = String.format(get_fixes, image, type, level)
-            def number = sh script: cmd_vulns, returnStdout: true
-            def fixes = sh script: cmd_fixes, returnStdout: true
-            if (number.trim() != '0'){
-                vulns_by_type.put(level, number.trim() + "(" + fixes.trim() + ")")
+    JSONObject report = new JSONObject()
+    def all_images = reqestGETJson("${engine_url}/images")
+    def image_digest = null
+    def response = null
+    if (all_images != null && all_images instanceof java.util.ArrayList){
+        for (img in all_images) {
+            for (tag in img.image_detail.fulltag){
+                if (tag.equals(image_name)) {
+                    image_digest = img.imageDigest
+                }
             }
         }
-        report.put(type,vulns_by_type)
-    }   
+    }
+    else{
+        println "ERROR: Images list must be ArrayList of JSONs"
+    } 
+    def image_vulns = null    
+    if (image_digest != null){
+        image_vulns = reqestGETJson("${engine_url}/images/${image_digest}/vuln/all")
+    }
+    else {
+        println "ERROR: Something went wrong, image digest is ${image_digest}"
+    }
+    if (image_vulns != null && org.apache.groovy.json.internal.LazyMap){
+        TreeSet<String> severities = new TreeSet<String>()
+        TreeSet<String> package_types = new TreeSet<String>()
+
+        image_vulns.vulnerabilities.each {
+             package_types.add(it.package_type)
+             severities.add(it.severity)
+             }
+        for (type in package_types){
+            JSONObject vulns_by_type = new JSONObject()
+            for (severity in severities){
+                HashSet<String> vulns = new HashSet<String>()
+                HashSet<String> vulns_with_fixes = new HashSet<String>()
+                vulns.addAll(( image_vulns.vulnerabilities.findAll{
+                    it.severity == severity && 
+                    it.package_type == type } ).package)
+                vulns_with_fixes.addAll(( image_vulns.vulnerabilities.findAll{
+                    it.severity == severity && 
+                    it.package_type == type && 
+                    it.fix != 'None'} ).package)
+                if(vulns.size() > 0){
+                    vulns_by_type.put(severity, vulns.size() + "(" + vulns_with_fixes.size() + ")")
+                }    
+            }
+            report.put(type, vulns_by_type)
+        }
+        println(report)       
+    }
     return report
 }
+
+def reqestGETJson(url){
+    def auth_string = "${ANCHORE_CLI_USER}:{ANCHORE_CLI_PASS}".getBytes().encodeBase64().toString();
+    def responce = null
+    def http_client = new URL(url).openConnection()
+    try {
+        http_client.setRequestMethod('GET')
+        http_client.setRequestProperty("Accept", "application/json")
+        http_client.setRequestProperty("Authorization", "Basic ${auth_string}")
+        http_client.setConnectTimeout(5000)
+        http_client.connect()
+        if (http_client.responseCode == 200 || http_client.responseCode == 202 ) {
+            InputStream input_stream = http_client.getInputStream()
+            responce = new groovy.json.JsonSlurper().parseText(input_stream.text)
+        }
+        else {
+            println("HTTP response error; ${http_client.responseCode}")
+        }
+    }
+    catch (Exception e) {
+        println(e)
+        throw e
+    }
+    finally {
+        if (http_client != null) {
+            http_client.disconnect();
+        }
+    }
+    return responce
+}
+
 return this
