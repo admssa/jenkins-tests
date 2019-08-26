@@ -55,7 +55,7 @@ def generatePlainReport(image_name, engine_url){
                     vulns_by_type.put(severity, vulns.size() + "(" + vulns_with_fixes.size() + ")")
                 }    
             }
-            report.put(type, vulns_by_type)
+            report.put(type.toLowerCase(), vulns_by_type)
         }
         println(report)       
     }
