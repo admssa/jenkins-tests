@@ -2,7 +2,6 @@
 import net.sf.json.JSONObject;
 
 def generatePlainReport(image, engine_url){
-    println "2 ${env.ANCHORE_CLI_USER}:{env.ANCHORE_CLI_PASS}"
     JSONObject report = new JSONObject()
     def all_images = reqestGETJson("${engine_url}/images")
     def image_digest = null
@@ -61,8 +60,7 @@ def generatePlainReport(image, engine_url){
 }
 
 def reqestGETJson(url){
-    def auth_string = "${env.ANCHORE_CLI_USER}:{env.ANCHORE_CLI_PASS}".getBytes().encodeBase64().toString();
-    println "2 ${env.ANCHORE_CLI_USER}:{env.ANCHORE_CLI_PASS}"
+    def auth_string = "${ANCHORE_CLI_USER}:${ANCHORE_CLI_PASS}".getBytes().encodeBase64().toString();
     def responce = null
     def http_client = new URL(url).openConnection()
     try {
