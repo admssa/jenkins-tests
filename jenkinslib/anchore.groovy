@@ -31,7 +31,7 @@ def generatePlainReport(image_name, engine_url){
     else {
         println "ERROR: Something went wrong, image digest is ${image_digest}"
     }
-    if (image_vulns != null && image_vulns instanceof org.apache.groovy.json.internal.LazyMap){
+    if (image_vulns != null){
         TreeSet<String> severities = new TreeSet<String>()
         TreeSet<String> package_types = new TreeSet<String>()
         
