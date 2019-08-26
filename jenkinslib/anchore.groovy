@@ -60,7 +60,7 @@ def generatePlainReport(image, engine_url){
 }
 
 def reqestGETJson(url){
-    def auth_string = "${ANCHORE_CLI_USER}:{ANCHORE_CLI_PASS}".getBytes().encodeBase64().toString();
+    def auth_string = "${env.ANCHORE_CLI_USER}:{env.ANCHORE_CLI_PASS}".getBytes().encodeBase64().toString();
     def responce = null
     def http_client = new URL(url).openConnection()
     try {
