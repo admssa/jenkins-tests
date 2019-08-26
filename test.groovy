@@ -24,7 +24,7 @@ generateByRequest("docker.io/johnsnowlabs/datalabs:jupyter-notebook-0.35.5-09-to
 // }
 
 
-def generateByRequest(image_name, engine_url, policy='2c53a13c-1765-11e8-82ef-23527761d060'){
+def generateByRequest(image_name, engine_url){
     JSONObject report = new JSONObject()
     def all_images = reqestGETJson("${engine_url}/images")
     def image_digest = null
@@ -41,9 +41,12 @@ def generateByRequest(image_name, engine_url, policy='2c53a13c-1765-11e8-82ef-23
     else{
         println "ERROR: Images list must be ArrayList of JSONs"
     } 
-    def check_status = reqestGETJson("${engine_url}/images/${image_digest}/check?bundle_id=${policy}&tag=${image_name}&detail=false")
+    def check_status = reqestGETJson("${engine_url}/images/${image_digest}/check?tag=${image_name}&detail=false")
     def anchore_status =  check_status[image_digest][image_name].status[0][0]
+    def reg = ~/^docker-host:65534\// 
+    def short_tag = image_name - reg
     report.put("anchore_check", anchore_status)
+    report.put("image", short_tag)
     def image_vulns = null    
     if (image_digest != null){
         image_vulns = reqestGETJson("${engine_url}/images/${image_digest}/vuln/all")
@@ -51,7 +54,7 @@ def generateByRequest(image_name, engine_url, policy='2c53a13c-1765-11e8-82ef-23
     else {
         println "ERROR: Something went wrong, image digest is ${image_digest}"
     }
-    if (image_vulns != null && org.apache.groovy.json.internal.LazyMap){
+    if (image_vulns != null &&  image_vulns instanceof org.apache.groovy.json.internal.LazyMap){
         TreeSet<String> severities = new TreeSet<String>()
         TreeSet<String> package_types = new TreeSet<String>()
         
@@ -79,7 +82,7 @@ def generateByRequest(image_name, engine_url, policy='2c53a13c-1765-11e8-82ef-23
         }
         println(report)       
     }
- 
+    return report
 }
 
 
