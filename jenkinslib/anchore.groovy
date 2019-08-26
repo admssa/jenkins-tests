@@ -18,6 +18,9 @@ def generatePlainReport(image, engine_url){
     else{
         println "ERROR: Images list must be ArrayList of JSONs"
     } 
+    def check_status = reqestGETJson("${engine_url}/images/${image_digest}/check?bundle_id=${policy}&tag=${image_name}&detail=false")
+    def anchore_status =  check_status[image_digest][image_name].status[0][0]
+    report.put("anchore_check", anchore_status)
     def image_vulns = null    
     if (image_digest != null){
         image_vulns = reqestGETJson("${engine_url}/images/${image_digest}/vuln/all")
@@ -28,7 +31,7 @@ def generatePlainReport(image, engine_url){
     if (image_vulns != null && org.apache.groovy.json.internal.LazyMap){
         TreeSet<String> severities = new TreeSet<String>()
         TreeSet<String> package_types = new TreeSet<String>()
-
+        
         image_vulns.vulnerabilities.each {
              package_types.add(it.package_type)
              severities.add(it.severity)

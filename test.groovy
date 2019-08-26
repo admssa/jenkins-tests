@@ -24,8 +24,8 @@ generateByRequest("docker.io/johnsnowlabs/datalabs:jupyter-notebook-0.35.5-09-to
 // }
 
 
-def generateByRequest(image_name, engine_url){
-    def report = new JSONObject()
+def generateByRequest(image_name, engine_url, policy='2c53a13c-1765-11e8-82ef-23527761d060'){
+    JSONObject report = new JSONObject()
     def all_images = reqestGETJson("${engine_url}/images")
     def image_digest = null
     def response = null
@@ -41,6 +41,9 @@ def generateByRequest(image_name, engine_url){
     else{
         println "ERROR: Images list must be ArrayList of JSONs"
     } 
+    def check_status = reqestGETJson("${engine_url}/images/${image_digest}/check?bundle_id=${policy}&tag=${image_name}&detail=false")
+    def anchore_status =  check_status[image_digest][image_name].status[0][0]
+    report.put("anchore_check", anchore_status)
     def image_vulns = null    
     if (image_digest != null){
         image_vulns = reqestGETJson("${engine_url}/images/${image_digest}/vuln/all")
