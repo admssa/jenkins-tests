@@ -1,7 +1,7 @@
 #!groovy
 import net.sf.json.JSONObject;
 
-def generatePlainReport(image, engine_url){
+def generatePlainReport(image_name, engine_url){
     JSONObject report = new JSONObject()
     def all_images = reqestGETJson("${engine_url}/images")
     def image_digest = null
