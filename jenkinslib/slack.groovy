@@ -33,7 +33,7 @@ def jsonToAttachment(short_report, color){
                 }
                 object.value = object.value.toString().replaceAll("[^a-zA-Z0-9():]+", " ")
             }
-            msg = msg + "\n*" + object.key.toString() + ":* _" + object.value.toString() + "_"
+            msg = msg + "\n*" + object.key.toString().trim() + ":* _" + object.value.toString() + "_ "
         }
     }
     JSONObject attachment = new JSONObject()
