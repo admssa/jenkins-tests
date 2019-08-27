@@ -24,16 +24,21 @@ def sendSlackString(slack_channel, msg, title, color, reports){
 
 def jsonToAttachment(short_report, color){
     def msg = new String() 
-
     for (object in short_report){
+        def line = new String() 
         if (object.value != null) {
             if (object.value instanceof net.sf.json.JSONObject){
                 if (object.value.size() == 0){
-                    object.value = "None"
+                    line = "None"
                 }
-                object.value = object.value.toString().replaceAll("[^a-zA-Z0-9():]+", " ")
+                object.value.each {
+                    line = line + it.key + ": " + it.value + ".  "
+                }
             }
-            msg = msg + "\n*" + object.key.toString() + ":* _" + object.value.toString() + "_"
+            else {
+                line = object.value.toString()
+            }
+            msg = msg + "\n*" + object.key.toString() + ":* _" + line + "_"
         }
     }
     JSONObject attachment = new JSONObject()
