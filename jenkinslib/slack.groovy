@@ -26,16 +26,18 @@ def jsonToAttachment(short_report, color){
     def msg = new String() 
 
     for (object in short_report){
+        def line = new String() 
         if (object.value != null) {
-            def line = new String()
             if (object.value instanceof net.sf.json.JSONObject){
                 if (object.value.size() == 0){
                     object.value = "None"
                 }
-                
-                for (vuln in object.value){
-                    line = line + vuln.key +": " + vuln.value + "  "
-                }  
+                object.value.each {
+                    line = line + it.key + ": " + it.value + "  "
+                }
+            }
+            else {
+                line = object.value.toString()
             }
             msg = msg + "\n*" + object.key.toString() + ":* _" + line + "_"
         }
