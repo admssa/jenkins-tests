@@ -58,7 +58,7 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
                         def splitted_name = img.imageName().split(':')
                         def digest = registry.getDigest(local_registry, splitted_name[0], splitted_name[1])
                         def short_report = anchore_script.generatePlainReport(digest, 
-                                                                              image_name, 
+                                                                              img.imageName(), 
                                                                               local_registry, 
                                                                               engine_url)
                         reports.add(short_report)
