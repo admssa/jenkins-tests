@@ -57,7 +57,10 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
                     for (img in images){
                         def splitted_name = img.imageName().split(':')
                         def digest = registry.getDigest(local_registry, splitted_name[0], splitted_name[1])
-                        def short_report = anchore_script.generatePlainReport(digest, img.imageName(), engine_url)
+                        def short_report = anchore_script.generatePlainReport(digest, 
+                                                                              image_name, 
+                                                                              local_registry, 
+                                                                              engine_url)
                         reports.add(short_report)
                         if (short_report == null || short_report.anchore_check != 'pass'){
                             currentBuild.result = 'UNSTABLE'

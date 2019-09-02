@@ -1,11 +1,12 @@
 #!groovy
 import net.sf.json.JSONObject;
 
-def generatePlainReport(image_name, engine_url){
+def generatePlainReport(image_digest, image_name, registry, engine_url){
     JSONObject report = new JSONObject()
+    def fulltag = String.format("%s/%s", registry, image_name)
     def response = null
-    def check_status = reqestGETJson("${engine_url}/images/${image_digest}/check?tag=${image_name}&detail=false")
-    def anchore_status =  check_status[image_digest][image_name].status[0][0]
+    def check_status = reqestGETJson("${engine_url}/images/${image_digest}/check?tag=${fulltag}&detail=false")
+    def anchore_status =  check_status[image_digest][fulltag].status[0][0]
     report.put("anchore_check", anchore_status)
     report.put("image", image_name)
     def image_vulns = reqestGETJson("${engine_url}/images/${image_digest}/vuln/all")
