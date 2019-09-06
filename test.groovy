@@ -6,9 +6,10 @@
 
 import net.sf.json.JSONObject;
 import groovy.json.JsonSlurperClassic;
+import groovy.json.JsonOutput;
 
 
-generateByRequest("docker.io/johnsnowlabs/datalabs:jupyter-notebook-0.35.5-09-token-6", "http://192.168.1.3:8228/v1")
+generateByRequest("sha256:98a429b3330027e450af97a3665ee04109392e763ebb437e558d6370974f1d55","admssa/tests:0.01", "docker.io", "http://192.168.1.3:8228/v1")
 
 // def generatePlainReport(image, engine_url){
 //     def cmd_get_vulns = "anchore-cli --json --url ${engine_url} image vuln ${image}"
@@ -24,36 +25,18 @@ generateByRequest("docker.io/johnsnowlabs/datalabs:jupyter-notebook-0.35.5-09-to
 // }
 
 
-def generateByRequest(image_name, engine_url){
+
+
+def generateByRequest(image_digest, image_name, registry, engine_url){
     JSONObject report = new JSONObject()
-    def all_images = reqestGETJson("${engine_url}/images")
-    def image_digest = null
+    def fulltag = String.format("%s/%s", registry, image_name)
     def response = null
-    if (all_images != null && all_images instanceof java.util.ArrayList){
-        for (img in all_images) {
-            for (tag in img.image_detail.fulltag){
-                if (tag.equals(image_name)) {
-                    image_digest = img.imageDigest
-                }
-            }
-        }
-    }
-    else{
-        println "ERROR: Images list must be ArrayList of JSONs"
-    } 
-    def check_status = reqestGETJson("${engine_url}/images/${image_digest}/check?tag=${image_name}&detail=false")
-    def anchore_status =  check_status[image_digest][image_name].status[0][0]
-    def reg = ~/^docker-host:65534\// 
-    def short_tag = image_name - reg
+    def check_status = reqestGETJson("${engine_url}/images/${image_digest}/check?tag=${fulltag}&detail=false")
+    def anchore_status =  check_status[image_digest][fulltag].status[0][0]
     report.put("anchore_check", anchore_status)
-    report.put("image", short_tag)
-    def image_vulns = null    
-    if (image_digest != null){
-        image_vulns = reqestGETJson("${engine_url}/images/${image_digest}/vuln/all")
-    }
-    else {
-        println "ERROR: Something went wrong, image digest is ${image_digest}"
-    }
+    report.put("image", image_name)
+    def image_vulns = reqestGETJson("${engine_url}/images/${image_digest}/vuln/all")
+
     if (image_vulns != null){
         TreeSet<String> severities = new TreeSet<String>()
         TreeSet<String> package_types = new TreeSet<String>()

@@ -5,6 +5,7 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
     def slack_channel     = "#automation_hooks"
     def engine_url        = "http://docker-host:8228/v1"    
     def slack             = load "jenkinslib/slack.groovy"
+    def registry          = load "jenkinslib/registry.groovy"
     def images            = []
     def reports           = []        
 
@@ -54,8 +55,12 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
                                                   usernameVariable: 'ANCHORE_CLI_USER', 
                                                   passwordVariable: 'ANCHORE_CLI_PASS')]) {
                     for (img in images){
-                        def image_name = String.format("%s/%s", local_registry, img.imageName())
-                        def short_report = anchore_script.generatePlainReport(image_name, engine_url)
+                        def splitted_name = img.imageName().split(':')
+                        def digest = registry.getDigest(local_registry, splitted_name[0], splitted_name[1])
+                        def short_report = anchore_script.generatePlainReport(digest, 
+                                                                              img.imageName(), 
+                                                                              local_registry, 
+                                                                              engine_url)
                         reports.add(short_report)
                         if (short_report == null || short_report.anchore_check != 'pass'){
                             currentBuild.result = 'UNSTABLE'
@@ -72,10 +77,9 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
                 }      
             }
             stage('Removing from the local registry'){
-                def registry = load "jenkinslib/registry.groovy"
                 for (img in images) {
-                    def splited_name = img.imageName().split(':')
-                    def img_removed = registry.deleteByTag(local_registry, splited_name[0], splited_name[1])
+                    def splitted_name = img.imageName().split(':')
+                    def img_removed = registry.deleteByTag(local_registry, splitted_name[0], splitted_name[1])
                     if (!img_removed){
                         currentBuild.result = 'UNSTABLE'
                     }
