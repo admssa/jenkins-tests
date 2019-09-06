@@ -32,7 +32,7 @@ node {
     }
     if (multibuild_opts.size() > 0){
         test.megatest()
-        //pipeline.runBuild(pwd(), docker_registry, multibuild_opts, dockerhub_creds, slack_channel)  
+        pipeline.runBuild(docker_registry, multibuild_opts, dockerhub_creds, slack_channel)  
     }
     else {
         println "Nothing to do here..."
