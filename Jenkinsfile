@@ -32,7 +32,11 @@ node {
     }
     if (multibuild_opts.size() > 0){
         test.megatest()
-        test.varstest("ololo", "ololo1")
+        test.varstest(docker_registry, slack_channel)
+        println docker_registry.getClass()
+        println multibuild_opts.getClass()
+        println dockerhub_creds.getClass()
+        println slack_channel.getClass()
         pipeline.runBuild(docker_registry, multibuild_opts, dockerhub_creds, slack_channel)  
     }
     else {
