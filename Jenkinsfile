@@ -1,8 +1,10 @@
+
 node {
+    @Library('jenkinslib')_
     checkout scm
-    def pipeline          = load "jenkinslib/pipeline.groovy"
     def docker_registry   = "admssa/diag"
     def dockerhub_creds   = "admssa_dockerhub"
+    def slack_channel     = "#automation_hooks"
     def multibuild_opts   = []
     def code_version      = sh(script: "cat ./CODE_VERSION", returnStdout: true)?.trim()
 
@@ -29,7 +31,7 @@ node {
              options: "-f tag-elastic/Dockerfile tag-elastic/." ] ]
     }
     if (multibuild_opts.size() > 0){
-        pipeline.runBuild(pwd(), docker_registry, multibuild_opts, dockerhub_creds)  
+        pipeline.runBuild(pwd(), docker_registry, multibuild_opts, dockerhub_creds, slack_channel)  
     }
     else {
         println "Nothing to do here..."
