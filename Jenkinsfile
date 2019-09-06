@@ -31,7 +31,7 @@ node {
              options: "-f tag-elastic/Dockerfile tag-elastic/." ] ]
     }
     if (multibuild_opts.size() > 0){
-        pipeline().runBuild(pwd(), docker_registry, multibuild_opts, dockerhub_creds, slack_channel)  
+        pipeline.runBuild(pwd(), docker_registry, multibuild_opts, dockerhub_creds, slack_channel)  
     }
     else {
         println "Nothing to do here..."
