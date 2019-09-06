@@ -1,5 +1,6 @@
-@Library('jenkinslib') _
+
 node {
+    @Library('jenkinslib')_
     checkout scm
     def docker_registry   = "admssa/diag"
     def dockerhub_creds   = "admssa_dockerhub"
