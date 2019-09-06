@@ -37,7 +37,7 @@ node {
         println multibuild_opts.getClass()
         println dockerhub_creds.getClass()
         println slack_channel.getClass()
-        pipeline.runBuild(docker_registry, multibuild_opts, dockerhub_creds, slack_channel)  
+        pipeline_general.runBuild(docker_registry, multibuild_opts, dockerhub_creds, slack_channel)  
     }
     else {
         println "Nothing to do here..."
