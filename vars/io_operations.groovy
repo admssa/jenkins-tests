@@ -29,5 +29,3 @@ def getDir(tag, dir){
         return null
     }
 }
-
-return this

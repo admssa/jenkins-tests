@@ -1,4 +1,4 @@
-def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds, slack_channel){
+def runBuild(docker_registry, multibuild_opts, dockerhub_creds, slack_channel){
     def tag               = env.TAG_NAME
     def local_registry    = "docker-host:65534"
     def msg_title         = "<${env.BUILD_URL}|${env.JOB_NAME}>"
@@ -123,5 +123,3 @@ def gitTagMessage(tag) {
     }
     return null
 }
-
-return this

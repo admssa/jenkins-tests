@@ -58,5 +58,3 @@ def getDigest(registry, repository, tag){
     println "Returning ${responce}"
     return responce
 }
-
-return this

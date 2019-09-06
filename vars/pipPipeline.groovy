@@ -32,5 +32,3 @@ def distributePipPackage(s3_path){
         sh "docker rmi ${image_name}"
     }
 }
-
-return this
