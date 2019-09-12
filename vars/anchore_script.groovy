@@ -43,14 +43,15 @@ def generatePlainReport(image_digest, image_name, registry, engine_url){
     return report
 }
 
+
 def contentHTMLreport(image_digest, image_name, registry, engine_url){
     def html_files = ""
     def fulltag = "${registry}/${image_name}"
     def content = ['os','python',"java","npm","gem","files"]
 
     for (c in content) {
-        def file_name = "${c}.html"
-        FileWriter writer = new FileWriter(file_name)
+        def file_name = "${c}_${image_digest}.html"
+        StringWriter writer = new StringWriter()
         println "passed wthighter"
         MarkupBuilder report = new MarkupBuilder(writer)
         println "passed Markup"
@@ -109,9 +110,8 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
                 }
             }
         } 
-        if (file.exist()){
-            html_files = html_files.concat("${file_name},")
-        }   
+        writeFile file: file_name, text: writer
+        html_files = html_files.concat("${file_name},")   
         writer.close()
     }
     return html_files
