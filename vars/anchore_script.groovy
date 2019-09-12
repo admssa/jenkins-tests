@@ -114,6 +114,7 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
     return html_files
 }
 
+@NonCPS
 def reqestGETJson(url){
     def auth_string = "${ANCHORE_CLI_USER}:${ANCHORE_CLI_PASS}".getBytes().encodeBase64().toString();
     def responce = null
