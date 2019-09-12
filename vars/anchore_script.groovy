@@ -54,6 +54,7 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
         File file = new File(file_name)
         FileWriter writer = new FileWriter(file)
         MarkupBuilder report = new MarkupBuilder(writer)
+        println pwd().toString()
         def content_json = reqestGETJson("${engine_url}/images/${image_digest}/content/${c}")
         report.html {
             meta charset:"utf-8"
