@@ -47,16 +47,14 @@ def generatePlainReport(image_digest, image_name, registry, engine_url){
 def contentHTMLreport(image_digest, image_name, registry, engine_url){
     def html_files = ""
     def fulltag = "${registry}/${image_name}"
-    def content = ['os','python',"java","npm","gem","files"]
+    def content_types = ['os','python',"java","npm","gem"]
 
-    for (c in content) {
+    for (c in content_types) {
         def file_name = "${c}_${image_digest}.html"
-        StringWriter writer = new StringWriter()
-        println "passed wthighter"
-        MarkupBuilder report = new MarkupBuilder(writer)
-        println "passed Markup"
+        def writer = new StringWriter()
+        def report = new MarkupBuilder(writer)
         def content_json = reqestGETJson("${engine_url}/images/${image_digest}/content/${c}")
-        println content_json
+        println content_json.content
         report.html {
             meta charset:"utf-8"
             meta name:"viewport", content:"width=device-width, initial-scale=1, shrink-to-fit=no"
@@ -110,9 +108,8 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
                 }
             }
         } 
-        writeFile file: file_name, text: writer
+        writeFile file: file_name, text: writer.toStrint()
         html_files = html_files + "${file_name},"   
-        writer.close()
     }
     return html_files
 }
