@@ -71,5 +71,3 @@ def reqestGETJson(url){
     }
     return responce
 }
-
-return this

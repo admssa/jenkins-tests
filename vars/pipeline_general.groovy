@@ -1,11 +1,8 @@
-def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
+def runBuild(docker_registry, multibuild_opts, dockerhub_creds, slack_channel){
     def tag               = env.TAG_NAME
     def local_registry    = "docker-host:65534"
     def msg_title         = "<${env.BUILD_URL}|${env.JOB_NAME}>"
-    def slack_channel     = "#automation_hooks"
     def engine_url        = "http://docker-host:8228/v1"    
-    def slack             = load "jenkinslib/slack.groovy"
-    def registry          = load "jenkinslib/registry.groovy"
     def images            = []
     def reports           = []        
 
@@ -50,7 +47,6 @@ def runBuild(repo_dir, docker_registry, multibuild_opts, dockerhub_creds){
                         name: 'anchore_images'                
             }
             stage('Prepare short reports'){
-                def anchore_script  = load "jenkinslib/anchore.groovy"
                 withCredentials([usernamePassword(credentialsId: 'anchore_admin', 
                                                   usernameVariable: 'ANCHORE_CLI_USER', 
                                                   passwordVariable: 'ANCHORE_CLI_PASS')]) {
@@ -124,5 +120,3 @@ def gitTagMessage(tag) {
     }
     return null
 }
-
-return this

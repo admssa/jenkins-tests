@@ -31,9 +31,12 @@ def jsonToAttachment(short_report, color){
                 if (object.value.size() == 0){
                     line = "None"
                 }
-                object.value.each {
-                    line = line + it.key + ": " + it.value + ".  "
+                else{
+                    object.value.each {
+                        line = line + it.key + ": " + it.value + "  "
+                    }
                 }
+
             }
             else {
                 line = object.value.toString()
@@ -85,5 +88,3 @@ def sendToSlack(buildResult, slack_channel, msg, title, reports=null){
         sendSlackNetral(slack_channel, msg, title, reports)
     }
 }
-
-return this
