@@ -43,7 +43,7 @@ def generatePlainReport(image_digest, image_name, registry, engine_url){
     return report
 }
 
-
+@NonCPS
 def contentHTMLreport(image_digest, image_name, registry, engine_url){
     def html_files = ""
     def fulltag = "${registry}/${image_name}"
