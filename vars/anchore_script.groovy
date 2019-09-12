@@ -111,7 +111,7 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
             }
         } 
         writeFile file: file_name, text: writer
-        html_files = html_files.concat("${file_name},")   
+        html_files = html_files + "${file_name},"   
         writer.close()
     }
     return html_files

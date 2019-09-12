@@ -58,7 +58,7 @@ def runBuild(docker_registry, multibuild_opts, dockerhub_creds, slack_channel){
                                                                             img.imageName(), 
                                                                             local_registry, 
                                                                             engine_url)
-                        report_files = report_files.concat(html_reports)
+                        report_files = report_files + html_reports
                         def short_report = anchore_script.generatePlainReport(digest, 
                                                                               img.imageName(), 
                                                                               local_registry, 
