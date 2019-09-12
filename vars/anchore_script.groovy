@@ -42,6 +42,74 @@ def generatePlainReport(image_digest, image_name, registry, engine_url){
     return report
 }
 
+def contentHTMLreport(image_digest, image_name, registry, engine_url){
+    def html_files = ""
+    def fulltag = "${registry}/${image_name}"
+    def content = ['os','python',"java","npm","gem","files"]
+
+    for (c in content) {
+        def file_name = "${c}_${image_digest}.html"
+        def writer = new FileWriter(file_name)
+        def report = new MarkupBuilder(writer)
+        def content_json = reqestGETJson("${engine_url}/images/${image_digest}/content/${c}")
+        report.html {
+            meta charset:"utf-8"
+            meta name:"viewport", content:"width=device-width, initial-scale=1, shrink-to-fit=no"
+            head {
+                style {
+                    mkp.yield """
+                        h3 {
+                        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+                        }
+                        #report {
+                        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+                        border-collapse: collapse;
+                        }
+
+                        #report td, #report th {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        }
+
+                        #report tr:nth-child(even){background-color: #f2f2f2;}
+
+                        #report tr:hover {background-color: #ddd;}
+
+                        #report th {
+                        padding-top: 12px;
+                        padding-bottom: 12px;
+                        text-align: left;
+                        background-color: #4CAF50;
+                        color: white;
+                        }
+                        """.stripIndent(10)
+                        }
+            }
+            body {
+                table(id:"report") {
+                    h3 String.format("%s: %s", c.toUpperCase(), image_name)
+                    theader {
+                        for(item in content_json.content[0]){
+                            th "${item.key}"
+                        }
+                    }
+                    tbody {
+                        for (items in content_json.content){
+                            tr{
+                                for (pkg in items) {
+                                    td pkg.value
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } 
+        html_files = html_files.concat("${file_name},")       
+    }
+    return html_files
+}
+
 def reqestGETJson(url){
     def auth_string = "${ANCHORE_CLI_USER}:${ANCHORE_CLI_PASS}".getBytes().encodeBase64().toString();
     def responce = null
