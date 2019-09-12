@@ -51,10 +51,10 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
 
     for (c in content) {
         def file_name = "${c}_${image_digest}.html"
+        println pwd().toString()        
         File file = new File(file_name)
         FileWriter writer = new FileWriter(file)
         MarkupBuilder report = new MarkupBuilder(writer)
-        println pwd().toString()
         def content_json = reqestGETJson("${engine_url}/images/${image_digest}/content/${c}")
         println content_json
         report.html {
