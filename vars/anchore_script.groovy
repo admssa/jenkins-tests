@@ -51,8 +51,9 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
 
     for (c in content) {
         def file_name = "${c}_${image_digest}.html"
-        def writer = new FileWriter(file_name)
-        def report = new MarkupBuilder(writer)
+        File file = new File(file_name)
+        FileWriter writer = new FileWriter(file)
+        MarkupBuilder report = new MarkupBuilder(writer)
         def content_json = reqestGETJson("${engine_url}/images/${image_digest}/content/${c}")
         report.html {
             meta charset:"utf-8"
@@ -107,7 +108,10 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
                 }
             }
         } 
-        html_files = html_files.concat("${file_name},")       
+        if (file.exist()){
+            html_files = html_files.concat("${file_name},")
+        }   
+        writer.close()
     }
     return html_files
 }
