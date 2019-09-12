@@ -56,11 +56,11 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
         def content_json = reqestGETJson("${engine_url}/images/${image_digest}/content/${c}")
         println content_json.content
         report.html {
-            meta charset:"utf-8"
-            meta name:"viewport", content:"width=device-width, initial-scale=1, shrink-to-fit=no"
-            head {
-                style {
-                    mkp.yield """
+            delegate.meta charset:"utf-8"
+            delegate.meta name:"viewport", content:"width=device-width, initial-scale=1, shrink-to-fit=no"
+            delegate.head {
+                delegate.style {
+                    delegate.mkp.yield """
                         h3 {
                         font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
                         }
@@ -88,19 +88,19 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
                         """.stripIndent(10)
                         }
             }
-            body {
-                table(id:"report") {
-                    h3 String.format("%s: %s", c.toUpperCase(), image_name)
-                    theader {
+            delegate.body {
+                delegate.table(id:"report") {
+                    delegate.h3 String.format("%s: %s", c.toUpperCase(), image_name)
+                    delegate.theader {
                         for(item in content_json.content[0]){
-                            th "${item.key}"
+                            delegate.th "${item.key}"
                         }
                     }
-                    tbody {
+                    delegate.tbody {
                         for (items in content_json.content){
-                            tr{
+                            delegate.tr{
                                 for (pkg in items) {
-                                    td pkg.value
+                                    delegate.td pkg.value
                                 }
                             }
                         }
