@@ -56,6 +56,7 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
         MarkupBuilder report = new MarkupBuilder(writer)
         println pwd().toString()
         def content_json = reqestGETJson("${engine_url}/images/${image_digest}/content/${c}")
+        println content_json
         report.html {
             meta charset:"utf-8"
             meta name:"viewport", content:"width=device-width, initial-scale=1, shrink-to-fit=no"
