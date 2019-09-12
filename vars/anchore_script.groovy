@@ -49,8 +49,7 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
     def content = ['os','python',"java","npm","gem","files"]
 
     for (c in content) {
-        def file_name = "${c}_${image_digest}.html"
-        writeFile file: file_name, text: ""
+        def file_name = "${c}.html"
         FileWriter writer = new FileWriter(file_name)
         println "passed wthighter"
         MarkupBuilder report = new MarkupBuilder(writer)
