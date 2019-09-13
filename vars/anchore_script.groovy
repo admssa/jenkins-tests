@@ -53,7 +53,7 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
 
         def content_json = reqestGETJson("${engine_url}/images/${image_digest}/content/${c}")
         println content_json.content
-        html_table = createHTML(content_json, image_name)
+        html_table = createHTML(content_json, image_name, c)
         writeFile file: file_name, text: writer.toString()
         html_files = html_files + "${file_name},"   
     }
@@ -61,7 +61,7 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
 }
 
 @NonCPS
-def createHTML(content_json, image_name){
+def createHTML(content_json, image_name, c){
     def writer = new StringWriter()
     def report = new MarkupBuilder(writer)
 
