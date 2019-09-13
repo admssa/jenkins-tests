@@ -118,7 +118,7 @@ def runBuild(docker_registry, multibuild_opts, dockerhub_creds, slack_channel){
             keepAll: true,
             reportDir: '',
             reportFiles: report_files,
-            reportName: "Anchore Licenses Report"
+            reportName: "Anchore Content Report"
             ])
         }
         sh 'docker rmi $(docker images -f "dangling=true" -q)  || true'
