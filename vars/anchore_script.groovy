@@ -68,7 +68,6 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
 def createHTML(content_json, image_name, c){
     def writer = new StringWriter()
     def report = new MarkupBuilder(writer)
-
     report.html {
         delegate.meta charset:"utf-8"
         delegate.meta name:"viewport", content:"width=device-width, initial-scale=1, shrink-to-fit=no"
@@ -105,22 +104,24 @@ def createHTML(content_json, image_name, c){
         delegate.body {
             delegate.table(id:"report") {
                 delegate.h3 String.format("%s: %s", c.toUpperCase(), image_name)
-                delegate.theader {
-                    for(item in content_json.content[0]){
-                        delegate.th "${item.key}"
-                        println item.key
+                if (content_json.content.size() > 0) {
+                    delegate.theader {
+                        for(item in content_json.content[0]){
+                            delegate.th "${item.key}"
+                            println item.key
+                        }
                     }
-                }
-                delegate.tbody {
-                    for (items in content_json.content){
-                        delegate.tr{
-                            for (pkg in items) {
-                                println pkg.value
-                                delegate.td pkg.value
+                    delegate.tbody {
+                        for (items in content_json.content){
+                            delegate.tr{
+                                for (pkg in items) {
+                                    println pkg.value
+                                    delegate.td pkg.value
+                                }
                             }
                         }
                     }
-                }
+                }    
             }
         }
     }
