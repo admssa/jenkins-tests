@@ -43,7 +43,7 @@ def generatePlainReport(image_digest, image_name, registry, engine_url){
     return report
 }
 
-@NonCPS
+
 def contentHTMLreport(image_digest, image_name, registry, engine_url){
     def html_files = ""
     def fulltag = "${registry}/${image_name}"
@@ -114,7 +114,7 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
     return html_files
 }
 
-@NonCPS
+
 def reqestGETJson(url){
     def auth_string = "${ANCHORE_CLI_USER}:${ANCHORE_CLI_PASS}".getBytes().encodeBase64().toString();
     def responce = null
