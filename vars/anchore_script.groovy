@@ -52,14 +52,16 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
         def file_name = "${c}_${image_digest}.html"
 
         def content_json = reqestGETJson("${engine_url}/images/${image_digest}/content/${c}")
-        println content_json.content
-        html_table = createHTML(content_json, image_name, c)
-        println "--------------got return---------------- ${c} -------------"
-        println html_table
-        writeFile file: file_name, text: html_table
-        println "File created ${file_name}"
-        html_files = html_files + "${file_name},"   
-        println html_files
+        if (content_json.content.size() > 0 ){
+            println content_json.content
+            def html_table = createHTML(content_json, image_name, c)
+            println "--------------got return---------------- ${c} -------------"
+            println html_table
+            writeFile file: file_name, text: html_table
+            println "File created ${file_name}"
+            html_files = html_files + "${file_name},"   
+            println html_files
+        }
     }
     return html_files
 }
@@ -104,24 +106,22 @@ def createHTML(content_json, image_name, c){
         delegate.body {
             delegate.table(id:"report") {
                 delegate.h3 String.format("%s: %s", c.toUpperCase(), image_name)
-                if (content_json.content.size() > 0) {
-                    delegate.theader {
-                        for(item in content_json.content[0]){
-                            delegate.th "${item.key}"
-                            println item.key
-                        }
+                delegate.theader {
+                    for(item in content_json.content[0]){
+                        delegate.th "${item.key}"
+                        println item.key
                     }
-                    delegate.tbody {
-                        for (items in content_json.content){
-                            delegate.tr{
-                                for (pkg in items) {
-                                    println pkg.value
-                                    delegate.td pkg.value
-                                }
+                }
+                delegate.tbody {
+                    for (items in content_json.content){
+                        delegate.tr{
+                            for (pkg in items) {
+                                println pkg.value
+                                delegate.td pkg.value
                             }
                         }
                     }
-                }    
+                }   
             }
         }
     }
@@ -142,7 +142,7 @@ def reqestGETJson(url){
         http_client.connect()
         if (http_client.responseCode == 200 || http_client.responseCode == 202 ) {
             InputStream input_stream = http_client.getInputStream()
-            responce = new groovy.json.JsonSlurper().parseText(input_stream.text)
+            responce = new groovy.json.JsonSlurperClassic().parseText(input_stream.text)
         }
         else {
             println("HTTP response error; ${http_client.responseCode}")
