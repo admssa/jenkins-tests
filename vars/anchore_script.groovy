@@ -47,14 +47,14 @@ def generatePlainReport(image_digest, image_name, registry, engine_url){
 def contentHTMLreport(image_digest, image_name, registry, engine_url){
     def html_files = ""
     def fulltag = "${registry}/${image_name}"
-    def content_types = ['os','python',"java","npm","gem"]
+    def content_types = ['os','python','java','npm','gem']
     for (c in content_types) {
         def file_name = "${c}_${image_digest}.html"
 
         def content_json = reqestGETJson("${engine_url}/images/${image_digest}/content/${c}")
         println content_json.content
         html_table = createHTML(content_json, image_name, c)
-        println "--------------got return----------------"
+        println "--------------got return---------------- ${c} -------------"
         println html_table
         writeFile file: file_name, text: html_table
         println "File created ${file_name}"
