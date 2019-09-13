@@ -48,71 +48,79 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
     def html_files = ""
     def fulltag = "${registry}/${image_name}"
     def content_types = ['os','python',"java","npm","gem"]
-
     for (c in content_types) {
         def file_name = "${c}_${image_digest}.html"
-        def writer = new StringWriter()
-        def report = new MarkupBuilder(writer)
+
         def content_json = reqestGETJson("${engine_url}/images/${image_digest}/content/${c}")
         println content_json.content
-        report.html {
-            delegate.meta charset:"utf-8"
-            delegate.meta name:"viewport", content:"width=device-width, initial-scale=1, shrink-to-fit=no"
-            delegate.head {
-                delegate.style {
-                    delegate.mkp.yield """
-                        h3 {
-                        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-                        }
-                        #report {
-                        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-                        border-collapse: collapse;
-                        }
-
-                        #report td, #report th {
-                        border: 1px solid #ddd;
-                        padding: 8px;
-                        }
-
-                        #report tr:nth-child(even){background-color: #f2f2f2;}
-
-                        #report tr:hover {background-color: #ddd;}
-
-                        #report th {
-                        padding-top: 12px;
-                        padding-bottom: 12px;
-                        text-align: left;
-                        background-color: #4CAF50;
-                        color: white;
-                        }
-                        """.stripIndent(10)
-                        }
-            }
-            delegate.body {
-                delegate.table(id:"report") {
-                    delegate.h3 String.format("%s: %s", c.toUpperCase(), image_name)
-                    delegate.theader {
-                        for(item in content_json.content[0]){
-                            delegate.th "${item.key}"
-                        }
-                    }
-                    delegate.tbody {
-                        for (items in content_json.content){
-                            delegate.tr{
-                                for (pkg in items) {
-                                    delegate.td pkg.value
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } 
+        html_table = createHTML(content_json, image_name)
         writeFile file: file_name, text: writer.toString()
         html_files = html_files + "${file_name},"   
     }
     return html_files
 }
+
+@NonCPS
+def createHTML(content_json, image_name){
+    def writer = new StringWriter()
+    def report = new MarkupBuilder(writer)
+
+    report.html {
+        delegate.meta charset:"utf-8"
+        delegate.meta name:"viewport", content:"width=device-width, initial-scale=1, shrink-to-fit=no"
+        delegate.head {
+            delegate.style {
+                delegate.mkp.yield """
+                    h3 {
+                    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+                    }
+                    #report {
+                    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+                    border-collapse: collapse;
+                    }
+
+                    #report td, #report th {
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                    }
+
+                    #report tr:nth-child(even){background-color: #f2f2f2;}
+
+                    #report tr:hover {background-color: #ddd;}
+
+                    #report th {
+                    padding-top: 12px;
+                    padding-bottom: 12px;
+                    text-align: left;
+                    background-color: #4CAF50;
+                    color: white;
+                    }
+                    """.stripIndent(10)
+                    }
+        }
+        delegate.body {
+            delegate.table(id:"report") {
+                delegate.h3 String.format("%s: %s", c.toUpperCase(), image_name)
+                delegate.theader {
+                    for(item in content_json.content[0]){
+                        delegate.th "${item.key}"
+                    }
+                }
+                delegate.tbody {
+                    for (items in content_json.content){
+                        delegate.tr{
+                            for (pkg in items) {
+                                delegate.td pkg.value
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return writer 
+}
+
 
 
 def reqestGETJson(url){
