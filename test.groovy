@@ -7,9 +7,9 @@
 import net.sf.json.JSONObject;
 import groovy.json.JsonSlurperClassic;
 import groovy.json.JsonOutput;
+import groovy.xml.MarkupBuilder;
 
-
-generateByRequest("sha256:98a429b3330027e450af97a3665ee04109392e763ebb437e558d6370974f1d55","admssa/tests:0.01", "docker.io", "http://192.168.1.3:8228/v1")
+contentHTMLreport("sha256:e29a5d862a9b2865a1c71f4cbc6e7a626630aae29325f7a65fb786ffc40e27bd","admssa/diag:tag0-test-01", "docker.io", "http://192.168.1.3:8228/v1")
 
 // def generatePlainReport(image, engine_url){
 //     def cmd_get_vulns = "anchore-cli --json --url ${engine_url} image vuln ${image}"
@@ -66,6 +66,76 @@ def generateByRequest(image_digest, image_name, registry, engine_url){
         println(report)       
     }
     return report
+}
+
+def contentHTMLreport(image_digest, image_name, registry, engine_url){
+    def html_files = ""
+    def fulltag = "${registry}/${image_name}"
+    def content = ['os','python',"java","npm","gem","files"]
+
+    for (c in content) {
+        def file_name = "${c}_${image_digest}.html"
+        def writer = new StringWriter()
+        def report = new MarkupBuilder(writer)
+        def content_json = reqestGETJson("${engine_url}/images/${image_digest}/content/${c}")
+        report.html {
+            meta charset:"utf-8"
+            meta name:"viewport", content:"width=device-width, initial-scale=1, shrink-to-fit=no"
+            head {
+                style {
+                    mkp.yield """
+                        h3 {
+                        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+                        }
+                        #report {
+                        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+                        border-collapse: collapse;
+                        }
+
+                        #report td, #report th {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        }
+
+                        #report tr:nth-child(even){background-color: #f2f2f2;}
+
+                        #report tr:hover {background-color: #ddd;}
+
+                        #report th {
+                        padding-top: 12px;
+                        padding-bottom: 12px;
+                        text-align: left;
+                        background-color: #4CAF50;
+                        color: white;
+                        }
+                        """.stripIndent(10)
+                        }
+            }
+            body {
+                table(id:"report") {
+                    h3 String.format("%s: %s", c.toUpperCase(), image_name)
+                    theader {
+                        for(item in content_json.content[0]){
+                            th "${item.key}"
+                        }
+                    }
+                    tbody {
+                        for (items in content_json.content){
+                            tr{
+                                for (pkg in items) {
+                                    td pkg.value
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } 
+        html_files = html_files + "${file_name},"
+        println writer
+    }
+    println html_files
+    return html_files
 }
 
 

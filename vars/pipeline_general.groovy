@@ -2,7 +2,8 @@ def runBuild(docker_registry, multibuild_opts, dockerhub_creds, slack_channel){
     def tag               = env.TAG_NAME
     def local_registry    = "docker-host:65534"
     def msg_title         = "<${env.BUILD_URL}|${env.JOB_NAME}>"
-    def engine_url        = "http://docker-host:8228/v1"    
+    def engine_url        = "http://docker-host:8228/v1" 
+    def report_files      = ""
     def images            = []
     def reports           = []        
 
@@ -53,6 +54,11 @@ def runBuild(docker_registry, multibuild_opts, dockerhub_creds, slack_channel){
                     for (img in images){
                         def splitted_name = img.imageName().split(':')
                         def digest = registry.getDigest(local_registry, splitted_name[0], splitted_name[1])
+                        def html_reports = anchore_script.contentHTMLreport(digest, 
+                                                                            img.imageName(), 
+                                                                            local_registry, 
+                                                                            engine_url)
+                        report_files = report_files + html_reports
                         def short_report = anchore_script.generatePlainReport(digest, 
                                                                               img.imageName(), 
                                                                               local_registry, 
@@ -105,6 +111,16 @@ def runBuild(docker_registry, multibuild_opts, dockerhub_creds, slack_channel){
         slack.sendSlackError(slack_channel, "Exception ${e} while running build: ${env.BUILD_URL}console", msg_title, null)    
     }    
     finally {
+        if (report_files.length() > 0){
+            publishHTML (target: [
+            allowMissing: false,
+            alwaysLinkToLastBuild: false,
+            keepAll: true,
+            reportDir: '',
+            reportFiles: report_files,
+            reportName: "Anchore Content Report"
+            ])
+        }
         sh 'docker rmi $(docker images -f "dangling=true" -q)  || true'
         def currentResult = currentBuild.result ?: 'SUCCESS'
         def message = "For details see Anchore <${env.BUILD_URL}anchore-results/|report> or full job <${env.BUILD_URL}console|output.>"        
