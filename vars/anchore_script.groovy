@@ -54,8 +54,11 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
         def content_json = reqestGETJson("${engine_url}/images/${image_digest}/content/${c}")
         println content_json.content
         html_table = createHTML(content_json, image_name, c)
+
         writeFile file: file_name, text: html_table
+        println "File created ${file_name}"
         html_files = html_files + "${file_name},"   
+        println html_files
     }
     return html_files
 }
@@ -120,6 +123,7 @@ def createHTML(content_json, image_name, c){
             }
         }
     }
+    println writer.toString()
     return writer.toString()
 }
 
