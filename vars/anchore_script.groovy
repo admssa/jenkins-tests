@@ -53,14 +53,9 @@ def contentHTMLreport(image_digest, image_name, registry, engine_url){
 
         def content_json = reqestGETJson("${engine_url}/images/${image_digest}/content/${c}")
         if (content_json.content.size() > 0 ){
-            println content_json.content
             def html_table = createHTML(content_json, image_name, c)
-            println "--------------got return---------------- ${c} -------------"
-            println html_table
             writeFile file: file_name, text: html_table
-            println "File created ${file_name}"
             html_files = html_files + "${file_name},"   
-            println html_files
         }
     }
     return html_files
@@ -109,14 +104,12 @@ def createHTML(content_json, image_name, c){
                 delegate.theader {
                     for(item in content_json.content[0]){
                         delegate.th "${item.key}"
-                        println item.key
                     }
                 }
                 delegate.tbody {
                     for (items in content_json.content){
                         delegate.tr{
                             for (pkg in items) {
-                                println pkg.value
                                 delegate.td pkg.value
                             }
                         }
