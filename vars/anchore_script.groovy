@@ -104,12 +104,14 @@ def createHTML(content_json, image_name, c){
                 delegate.theader {
                     for(item in content_json.content[0]){
                         delegate.th "${item.key}"
+                        println item.key
                     }
                 }
                 delegate.tbody {
                     for (items in content_json.content){
                         delegate.tr{
                             for (pkg in items) {
+                                println pkg.value
                                 delegate.td pkg.value
                             }
                         }
